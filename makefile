@@ -1,4 +1,4 @@
-PACKAGE_TARNAME      ?= gz
+PACKAGE_TARNAME      ?= shrekz
 PACKAGE_URL          ?= github.com/glankk/gz
 ifeq ($(origin PACKAGE_VERSION), undefined)
 PACKAGE_VERSION      := $(shell git describe --tags --dirty 2>/dev/null)

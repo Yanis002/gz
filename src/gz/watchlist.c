@@ -311,6 +311,22 @@ static int toggle_visibility_proc(struct menu_item *item,
   return 0;
 }
 
+// force gz to load the hardcoded watchlist again on the next init (aka next boot),
+// requires to save the settings
+static int toggle_load_on_next_boot_proc(struct menu_item *item,
+                      enum menu_callback_reason reason,
+                      void *data)
+{
+  struct menu_item *watchlist = data;
+  if (reason == MENU_CALLBACK_CHANGED) {
+    settings->bits.load_def_watches = menu_checkbox_get(item);
+  }
+  else if (reason == MENU_CALLBACK_THINK) {
+    menu_checkbox_set(item, settings->bits.load_def_watches);
+  }
+  return 0;
+}
+
 struct menu_item *watchlist_create(struct menu *menu,
                                    struct menu *menu_release,
                                    int x, int y)
@@ -322,6 +338,10 @@ struct menu_item *watchlist_create(struct menu *menu,
   menu_add_static(menu, x, y, "visible", 0xC0C0C0);
   data->visibility_checkbox = menu_add_checkbox(menu, x+8, y,
                                                 toggle_visibility_proc, item);
+
+  menu_add_static(menu, x + 10, y, "reset on next boot", 0xC0C0C0);
+  data->visibility_checkbox = menu_add_checkbox(menu, x+29, y,
+                                                toggle_load_on_next_boot_proc, item);
 
   data->menu_release = menu_release;
   data->imenu = imenu;

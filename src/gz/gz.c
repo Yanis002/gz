@@ -1091,6 +1091,141 @@ static void main_return_proc(struct menu_item *item, void *data)
   gz_hide_menu();
 }
 
+/**
+ * Link X
+ * Link Y
+ * Link Z
+ * XZ Speed
+ * XZ Units Traveled
+ * Movement Angle
+ * Facing Angle
+ * Camera Angle
+ * Global Frame Counter
+ * Cutscene Pointer
+ *
+ * 1.0, 1.2 and MQ-J only:
+ * deku tree blue warp timer (after reload)
+ * deku tree blue warp timer (no reload)
+ * jabu blue warp timer (no reload)
+ */
+
+#if Z64_VERSION == Z64_OOT10
+#define INIT_WATCHES() {                                        \
+  watchlist_add(gz.menu_watchlist, 0x801DAA54, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DAA58, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DAA5C, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DB258, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DAA8C, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DB25C, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801DAAE6, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C87BC, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C853C, WATCH_TYPE_S32); \
+  watchlist_add(gz.menu_watchlist, 0x801CA208, WATCH_TYPE_X32); \
+  watchlist_add(gz.menu_watchlist, 0x801EFA92, WATCH_TYPE_U16); \
+  watchlist_add(gz.menu_watchlist, 0x801F7AE2, WATCH_TYPE_U16); \
+  watchlist_add(gz.menu_watchlist, 0x801FC682, WATCH_TYPE_U16); \
+}
+#elif Z64_VERSION == Z64_OOT11
+#define INIT_WATCHES() {                                        \
+  watchlist_add(gz.menu_watchlist, 0x801DAC14, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DAC18, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DAC1C, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DB418, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801C8918, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DB41C, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801DACA6, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C897C, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C86FC, WATCH_TYPE_S32); \
+  watchlist_add(gz.menu_watchlist, 0x801CA3C8, WATCH_TYPE_X32); \
+}
+#elif Z64_VERSION == Z64_OOT12
+#define INIT_WATCHES() {                                        \
+  watchlist_add(gz.menu_watchlist, 0x801DB314, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DB318, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DB31C, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DBB18, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801C9018, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DBB1C, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801DB3A6, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C907C, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C8DFC, WATCH_TYPE_S32); \
+  watchlist_add(gz.menu_watchlist, 0x801CAAC8, WATCH_TYPE_X32); \
+  watchlist_add(gz.menu_watchlist, 0x801F0352, WATCH_TYPE_U16); \
+  watchlist_add(gz.menu_watchlist, 0x801F83A2, WATCH_TYPE_U16); \
+  watchlist_add(gz.menu_watchlist, 0x801FCF42, WATCH_TYPE_U16); \
+}
+#elif Z64_VERSION == Z64_OOTMQJ
+#define INIT_WATCHES() {                                        \
+  watchlist_add(gz.menu_watchlist, 0x801DBBD4, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DBBD8, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DBBDC, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DC3D8, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801C9918, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DC3DC, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801DBC66, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C997C, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C96FC, WATCH_TYPE_S32); \
+  watchlist_add(gz.menu_watchlist, 0x801CB3C8, WATCH_TYPE_X32); \
+  watchlist_add(gz.menu_watchlist, 0x801F87C2, WATCH_TYPE_U16); \
+  watchlist_add(gz.menu_watchlist, 0x801F0A32, WATCH_TYPE_U16); \
+  watchlist_add(gz.menu_watchlist, 0x801FA8B2, WATCH_TYPE_U16); \
+}
+#elif Z64_VERSION == Z64_OOTMQU
+#define INIT_WATCHES() {                                        \
+  watchlist_add(gz.menu_watchlist, 0x801DBB94, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DBB98, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DBB9C, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DC398, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801C98D8, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DC39C, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801DBC26, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C993C, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C96BC, WATCH_TYPE_S32); \
+  watchlist_add(gz.menu_watchlist, 0x801CB388, WATCH_TYPE_X32); \
+}
+#elif Z64_VERSION == Z64_OOTGCJ
+#define INIT_WATCHES() {                                        \
+  watchlist_add(gz.menu_watchlist, 0x801DBBD4, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DBBD8, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DBBDC, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DC3D8, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801C9918, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DC3DC, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801DBC66, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C997C, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C96FC, WATCH_TYPE_S32); \
+  watchlist_add(gz.menu_watchlist, 0x801CB3C8, WATCH_TYPE_X32); \
+}
+#elif Z64_VERSION == Z64_OOTGCU
+#define INIT_WATCHES() {                                        \
+  watchlist_add(gz.menu_watchlist, 0x801DBBD4, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DBBD8, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DBBDC, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DC3D8, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801C9918, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x801DC3DC, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801DBC66, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C997C, WATCH_TYPE_X16); \
+  watchlist_add(gz.menu_watchlist, 0x801C96FC, WATCH_TYPE_S32); \
+  watchlist_add(gz.menu_watchlist, 0x801CB3C8, WATCH_TYPE_X32); \
+}
+/* #elif Z64_VERSION == Z64_OOTCEJ
+#define INIT_WATCHES() {                                        \
+  watchlist_add(gz.menu_watchlist, 0x80000000, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x80000000, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x80000000, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x80000000, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x80000000, WATCH_TYPE_F32); \
+  watchlist_add(gz.menu_watchlist, 0x80000000, WATCH_TYPE_X32); \
+  watchlist_add(gz.menu_watchlist, 0x80000000, WATCH_TYPE_X32); \
+  watchlist_add(gz.menu_watchlist, 0x80000000, WATCH_TYPE_X32); \
+  watchlist_add(gz.menu_watchlist, 0x80000000, WATCH_TYPE_X32); \
+  watchlist_add(gz.menu_watchlist, 0x80000000, WATCH_TYPE_X32);
+} */
+#else
+#define INIT_WATCHES()
+#endif
+
 static void init(void)
 {
   /* startup */
@@ -1145,8 +1280,8 @@ static void init(void)
   gz.hide_actors = 0;
   gz.free_cam = 0;
   gz.lock_cam = 0;
-  gz.cam_mode = CAMMODE_CAMERA;
-  gz.cam_bhv = CAMBHV_MANUAL;
+  gz.cam_mode = CAMMODE_VIEW;
+  gz.cam_bhv = CAMBHV_RADIAL;
   gz.cam_dist_min = 100;
   gz.cam_dist_max = 400;
   gz.cam_yaw = 0.f;
@@ -1218,6 +1353,12 @@ static void init(void)
   gz_apply_settings();
 
   gz.ready = 1;
+
+  // initialize a default watchlist on the very first boot
+  if (settings->bits.load_def_watches) {
+    INIT_WATCHES();
+    settings->bits.load_def_watches = 0;
+  }
 }
 
 int main()
