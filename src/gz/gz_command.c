@@ -236,6 +236,13 @@ void command_savestate(void)
   }
 }
 
+#ifdef WIIVC
+#define ARRAY_COUNT(arr) (uint32_t)(sizeof(arr) / sizeof(arr[0]))
+#define ROOM_DRAW_OPA (1 << 0)
+#define ROOM_DRAW_XLU (1 << 1)
+extern void Room_Draw(z64_game_t* play, z64_room_t* room, uint32_t flags);
+#endif
+
 void command_loadstate(void)
 {
   if (!zu_in_game())
@@ -243,6 +250,20 @@ void command_loadstate(void)
   else if (gz.state_buf[gz.state_slot]) {
     struct state_meta *state = gz.state_buf[gz.state_slot];
     load_state(state);
+
+#ifdef WIIVC
+    uint32_t roomDrawFlags = ROOM_DRAW_OPA | ROOM_DRAW_XLU;
+
+    for (uint8_t i = 0; i < ARRAY_COUNT(z64_game.room_ctxt.rooms); i++) {
+      z64_room_t* room = &z64_game.room_ctxt.rooms[i];
+
+      if (room->mesh_hdr->mode == 1) {
+        // force drawing the room after the state is loaded to make sure the background loads properly
+        Room_Draw(&z64_game, room, roomDrawFlags & (ROOM_DRAW_OPA | ROOM_DRAW_XLU));
+      }
+    }
+#endif
+
     if (gz.movie_state != MOVIE_IDLE && state->movie_frame != -1)
       gz_movie_seek(state->movie_frame);
     /* connect direct input with state's context input */
