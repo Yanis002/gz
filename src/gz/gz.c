@@ -22,6 +22,11 @@
 #include "z64.h"
 #include "zu.h"
 
+// makes vscode happier
+#ifdef __INTELLISENSE__
+#define HOOK
+#endif
+
 __attribute__((section(".data")))
 struct gz gz =
 {
@@ -167,6 +172,8 @@ static void main_hook(void)
     *(uint8_t *)(&z64_message_state[0x000C]) = 0x01;
   if (settings->cheats & (1 << CHEAT_NOHUD))
       z64_file.hud_flag = 0x001;
+
+  settings->bits.disable_health_beep = settings->cheats & (1 << CHEAT_NOHEALTHBEEP) ? 1 : 0;
 
   /* handle commands */
   for (int i = 0; i < COMMAND_MAX; ++i) {
@@ -1083,6 +1090,18 @@ HOOK void bombchu_floor_poly_hook(z64_game_t *game, z64_actor_t *actor,
   if (settings->bits.gc_oob_chu && actor->floor_poly == NULL) {
     static z64_col_poly_t zero_poly = { 0 };
     actor->floor_poly = &zero_poly;
+  }
+}
+
+extern void Sfx_PlaySfxCentered(uint16_t sfxId);
+
+/**
+ * Replaces call to Sfx_PlaySfxCentered in Health_UpdateBeatingHeart to
+ * allow the low-health sound to play if the cheat is disabled.
+ */
+HOOK void beep_hook(uint16_t sfxId) {
+  if (!settings->bits.disable_health_beep) {
+    Sfx_PlaySfxCentered(sfxId);
   }
 }
 
