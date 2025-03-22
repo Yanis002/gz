@@ -273,6 +273,7 @@ static void restore_settings_proc(struct menu_item *item, void *data)
 {
   settings_load_default();
   gz_apply_settings();
+  watchlist_init();
   gz_log("loaded defaults");
 }
 

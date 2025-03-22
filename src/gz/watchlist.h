@@ -11,5 +11,7 @@ void              watchlist_show(struct menu_item *item);
 void              watchlist_hide(struct menu_item *item);
 int               watchlist_add(struct menu_item *item, uint32_t address,
                                 enum watch_type type);
+void watchlist_init(void);
+void              watchlist_set_anchor(struct menu_item *watchlist, int member_index, int x, int y);
 
 #endif

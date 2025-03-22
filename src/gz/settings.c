@@ -4,6 +4,7 @@
 #include "resource.h"
 #include "settings.h"
 #include "zu.h"
+#include "watchlist.h"
 
 _Static_assert(SETTINGS_PROFILE_MAX != 0,
                "settings data size exceeds sram capacity");
@@ -74,7 +75,7 @@ void settings_load_default(void)
   d->bits.path_view_lines = 1;
   d->bits.holl_view_xlu = 1;
   d->bits.holl_view_all = 0;
-  d->bits.watches_visible = 1;
+  d->bits.watches_visible = 0;
   d->menu_x = 20;
   d->menu_y = 64;
   d->input_display_x = 20;
@@ -131,7 +132,6 @@ void settings_load_default(void)
   d->binds[COMMAND_STARTTIMER] = bind_make(0);
   d->binds[COMMAND_STOPTIMER] = bind_make(0);
   d->binds[COMMAND_RESET] = bind_make(0);
-  d->bits.load_def_watches = 1;
 }
 
 void settings_save(int profile)

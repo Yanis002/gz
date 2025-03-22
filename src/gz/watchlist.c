@@ -160,6 +160,7 @@ static int position_proc(struct menu_item *item,
     default:
       break;
   }
+  gz_log("x: %d, y: %d", member_data->x, member_data->y);
   watch->pxoffset = member_data->x;
   watch->pyoffset = member_data->y;
   return 0;
@@ -311,22 +312,6 @@ static int toggle_visibility_proc(struct menu_item *item,
   return 0;
 }
 
-// force gz to load the hardcoded watchlist again on the next init (aka next boot),
-// requires to save the settings
-static int toggle_load_on_next_boot_proc(struct menu_item *item,
-                      enum menu_callback_reason reason,
-                      void *data)
-{
-  struct menu_item *watchlist = data;
-  if (reason == MENU_CALLBACK_CHANGED) {
-    settings->bits.load_def_watches = menu_checkbox_get(item);
-  }
-  else if (reason == MENU_CALLBACK_THINK) {
-    menu_checkbox_set(item, settings->bits.load_def_watches);
-  }
-  return 0;
-}
-
 struct menu_item *watchlist_create(struct menu *menu,
                                    struct menu *menu_release,
                                    int x, int y)
@@ -338,10 +323,6 @@ struct menu_item *watchlist_create(struct menu *menu,
   menu_add_static(menu, x, y, "visible", 0xC0C0C0);
   data->visibility_checkbox = menu_add_checkbox(menu, x+8, y,
                                                 toggle_visibility_proc, item);
-
-  menu_add_static(menu, x + 10, y, "reset on next boot", 0xC0C0C0);
-  data->visibility_checkbox = menu_add_checkbox(menu, x+29, y,
-                                                toggle_load_on_next_boot_proc, item);
 
   data->menu_release = menu_release;
   data->imenu = imenu;
@@ -678,4 +659,169 @@ static int import_callback(const char *path, void *data)
     watchfile_view(menu_top);
   }
   return 1;
+}
+
+/**
+ * Link X
+ * Link Y
+ * Link Z
+ * XZ Speed
+ * XZ Units Traveled
+ * Movement Angle
+ * Facing Angle
+ * Camera Angle
+ * Global Frame Counter
+ * Cutscene Pointer
+ *
+ * 1.0, 1.2 and MQ-J only:
+ * deku tree blue warp timer (after reload)
+ * deku tree blue warp timer (no reload)
+ * jabu blue warp timer (no reload)
+ */
+
+#if Z64_VERSION == Z64_OOT10
+#define WATCH_LINK_X (0x801DAA54)
+#define WATCH_LINK_Y (0x801DAA58)
+#define WATCH_LINK_Z (0x801DAA5C)
+#define WATCH_XZSPEED (0x801DB258)
+#define WATCH_XZUNITS (0x801DAA8C)
+#define WATCH_MOVEMENTANGLE (0x801DB25C)
+#define WATCH_FACINGANGLE (0x801DAAE6)
+#define WATCH_CAMANGLE (0x801C87BC)
+#define WATCH_STATEFRAMES (0x801C853C)
+#define WATCH_CSPTR (0x801CA208)
+#define WATCH_DEKUWARPRELOAD (0x801EFA92)
+#define WATCH_DEKUWARPNORELOAD (0x801F7AE2)
+#define WATCH_JABUWARPNORELOAD (0x801FC682)
+#elif Z64_VERSION == Z64_OOT11
+#define WATCH_LINK_X (0x801DAC14)
+#define WATCH_LINK_Y (0x801DAC18)
+#define WATCH_LINK_Z (0x801DAC1C)
+#define WATCH_XZSPEED (0x801DB418)
+#define WATCH_XZUNITS (0x801C8918)
+#define WATCH_MOVEMENTANGLE (0x801DB41C)
+#define WATCH_FACINGANGLE (0x801DACA6)
+#define WATCH_CAMANGLE (0x801C897C)
+#define WATCH_STATEFRAMES (0x801C86FC)
+#define WATCH_CSPTR (0x801CA3C8)
+#elif Z64_VERSION == Z64_OOT12
+#define WATCH_LINK_X (0x801DB314)
+#define WATCH_LINK_Y (0x801DB318)
+#define WATCH_LINK_Z (0x801DB31C)
+#define WATCH_XZSPEED (0x801DBB18)
+#define WATCH_XZUNITS (0x801C9018)
+#define WATCH_MOVEMENTANGLE (0x801DBB1C)
+#define WATCH_FACINGANGLE (0x801DB3A6)
+#define WATCH_CAMANGLE (0x801C907C)
+#define WATCH_STATEFRAMES (0x801C8DFC)
+#define WATCH_CSPTR (0x801CAAC8)
+#define WATCH_DEKUWARPRELOAD (0x801F0352)
+#define WATCH_DEKUWARPNORELOAD (0x801F83A2)
+#define WATCH_JABUWARPNORELOAD (0x801FCF42)
+#elif Z64_VERSION == Z64_OOTMQJ
+#define WATCH_LINK_X (0x801DBBD4)
+#define WATCH_LINK_Y (0x801DBBD8)
+#define WATCH_LINK_Z (0x801DBBDC)
+#define WATCH_XZSPEED (0x801DC3D8)
+#define WATCH_XZUNITS (0x801C9918)
+#define WATCH_MOVEMENTANGLE (0x801DC3DC)
+#define WATCH_FACINGANGLE (0x801DBC66)
+#define WATCH_CAMANGLE (0x801C997C)
+#define WATCH_STATEFRAMES (0x801C96FC)
+#define WATCH_CSPTR (0x801CB3C8)
+#define WATCH_DEKUWARPRELOAD (0x801F87C2)
+#define WATCH_DEKUWARPNORELOAD (0x801F0A32)
+#define WATCH_JABUWARPNORELOAD (0x801FA8B2)
+#elif Z64_VERSION == Z64_OOTMQU
+#define WATCH_LINK_X (0x801DBB94)
+#define WATCH_LINK_Y (0x801DBB98)
+#define WATCH_LINK_Z (0x801DBB9C)
+#define WATCH_XZSPEED (0x801DC398)
+#define WATCH_XZUNITS (0x801C98D8)
+#define WATCH_MOVEMENTANGLE (0x801DC39C)
+#define WATCH_FACINGANGLE (0x801DBC26)
+#define WATCH_CAMANGLE (0x801C993C)
+#define WATCH_STATEFRAMES (0x801C96BC)
+#define WATCH_CSPTR (0x801CB388)
+#elif Z64_VERSION == Z64_OOTGCJ
+#define WATCH_LINK_X (0x801DBBD4)
+#define WATCH_LINK_Y (0x801DBBD8)
+#define WATCH_LINK_Z (0x801DBBDC)
+#define WATCH_XZSPEED (0x801DC3D8)
+#define WATCH_XZUNITS (0x801C9918)
+#define WATCH_MOVEMENTANGLE (0x801DC3DC)
+#define WATCH_FACINGANGLE (0x801DBC66)
+#define WATCH_CAMANGLE (0x801C997C)
+#define WATCH_STATEFRAMES (0x801C96FC)
+#define WATCH_CSPTR (0x801CB3C8)
+#elif Z64_VERSION == Z64_OOTGCU
+#define WATCH_LINK_X (0x801DBBD4)
+#define WATCH_LINK_Y (0x801DBBD8)
+#define WATCH_LINK_Z (0x801DBBDC)
+#define WATCH_XZSPEED (0x801DC3D8)
+#define WATCH_XZUNITS (0x801C9918)
+#define WATCH_MOVEMENTANGLE (0x801DC3DC)
+#define WATCH_FACINGANGLE (0x801DBC66)
+#define WATCH_CAMANGLE (0x801C997C)
+#define WATCH_STATEFRAMES (0x801C96FC)
+#define WATCH_CSPTR (0x801CB3C8)
+/* #elif Z64_VERSION == Z64_OOTCEJ
+#define WATCH_LINK_X (0x80000000) 
+#define WATCH_LINK_Y (0x80000000) 
+#define WATCH_LINK_Z (0x80000000) 
+#define WATCH_XZSPEED (0x80000000) 
+#define WATCH_XZUNITS (0x80000000) 
+#define WATCH_MOVEMENTANGLE (0x80000000) 
+#define WATCH_FACINGANGLE (0x80000000) 
+#define WATCH_CAMANGLE (0x80000000) 
+#define WATCH_STATEFRAMES (0x80000000) 
+#define WATCH_CSPTR (0x80000000)  */
+#endif
+
+struct init_watch_info {
+  uint32_t addr;
+  enum watch_type type;
+  char anchored;
+  int x;
+  int y;
+} init_watch[] = {
+  { WATCH_LINK_X,           WATCH_TYPE_F32, 1, 188, 80},
+  { WATCH_LINK_Y,           WATCH_TYPE_F32, 1, 188, 88},
+  { WATCH_LINK_Z,           WATCH_TYPE_F32, 1, 188, 96},
+  { WATCH_XZSPEED,          WATCH_TYPE_F32, 0, 188, 104},
+  { WATCH_XZUNITS,          WATCH_TYPE_F32, 0, 188, 112},
+  { WATCH_MOVEMENTANGLE,    WATCH_TYPE_X16, 0, 188, 120},
+  { WATCH_FACINGANGLE,      WATCH_TYPE_X16, 1, 188, 128},
+  { WATCH_CAMANGLE,         WATCH_TYPE_X16, 0, 188, 136},
+  { WATCH_STATEFRAMES,      WATCH_TYPE_S32, 0, 188, 144},
+  { WATCH_CSPTR,            WATCH_TYPE_X32, 0, 188, 152},
+#if Z64_VERSION == Z64_OOT10 || Z64_VERSION == Z64_OOT12 || Z64_VERSION == Z64_OOTMQJ
+  { WATCH_DEKUWARPRELOAD,   WATCH_TYPE_U16, 0, 188, 160 },
+  { WATCH_DEKUWARPNORELOAD, WATCH_TYPE_U16, 0, 188, 168 },
+  { WATCH_JABUWARPNORELOAD, WATCH_TYPE_U16, 0, 188, 176 },
+#endif
+  { 0 }
+};
+
+void watchlist_set_anchor(struct menu_item *watchlist, int member_index, int x, int y) {
+  struct item_data *data = watchlist->data;
+
+  if (member_index < data->members.size) {
+    struct member_data *member_data = get_member(data, member_index);
+    member_data->x = x;
+    member_data->y = y;
+    member_data->position_set = 1;
+    release_member(member_data);
+  }
+}
+
+void watchlist_init(void) {
+  // initialize a default watchlist on the very first boot
+  for (int i = 0; init_watch[i].addr != 0; i++) {
+    watchlist_add(gz.menu_watchlist, init_watch[i].addr, init_watch[i].type);
+
+    if (init_watch[i].anchored) {
+      watchlist_set_anchor(gz.menu_watchlist, i, init_watch[i].x, init_watch[i].y);
+    }
+  }
 }
