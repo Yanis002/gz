@@ -3,9 +3,12 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdint.h>
-#include "io.h"
-#include "sys.h"
 #include "fat.h"
+#include "io.h"
+#include "ique.h"
+#include "rdb.h"
+#include "sys.h"
+#include "z64.h"
 
 struct desc
 {
@@ -707,6 +710,13 @@ time_t time(time_t *tloc)
   return 0;
 }
 
+void abort()
+{
+  rdb_interrupt();
+  cpu_reset();
+  __builtin_unreachable();
+}
+
 void sys_reset(void)
 {
   fat_ready = 0;
@@ -724,7 +734,8 @@ void *sbrk(intptr_t incr)
 {
   extern char end[];
   static void *brk = end;
-  if ((uintptr_t)brk + incr > 0x80800000) {
+  uintptr_t heap_end = is_ique() ? (uintptr_t)__osBbSramAddress : 0x80800000;
+  if ((uintptr_t)brk + incr > heap_end) {
     return (void *)-1;
   }
   else {
@@ -732,4 +743,26 @@ void *sbrk(intptr_t incr)
     brk += incr;
     return ret;
   }
+}
+
+/* stubs */
+void (*signal(int sig, void (*handler)(int)))(int)
+{
+  return NULL;
+}
+
+int raise(int sig)
+{
+  return -1;
+}
+
+pid_t getpid(void)
+{
+  return 0;
+}
+
+int kill(pid_t pid, int sig)
+{
+  errno = ENOSYS;
+  return -1;
 }

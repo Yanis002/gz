@@ -160,11 +160,11 @@ static void main_hook(void)
            sizeof(z64_game.if_ctxt.restriction_flags));
   }
   if (settings->cheats & (1 << CHEAT_NOMAP))
-    z64_file.gameinfo->minimap_disabled = 1;
+    z64_gameinfo->minimap_disabled = 1;
   if (settings->cheats & (1 << CHEAT_ISG))
     z64_link.sword_state = 1;
   if (settings->cheats & (1 << CHEAT_QUICKTEXT))
-    *(uint8_t *)(&z64_message_state[0x000C]) = 0x01;
+    z64_textbox_skipped = 1;
   if (settings->cheats & (1 << CHEAT_NOHUD))
       z64_file.hud_flag = 0x001;
 
@@ -363,7 +363,7 @@ static void main_hook(void)
     else if (settings->bits.lag_unit == SETTINGS_LAG_SECONDS)
       gfx_printf(font, x, settings->lag_counter_y, "%8.2f", lag_frames / 60.f);
   }
-  gz.frame_counter += z64_file.gameinfo->update_rate;
+  gz.frame_counter += z64_gameinfo->update_rate;
 
   /* execute and draw timer */
   if (!gz.timer_active)
@@ -401,6 +401,7 @@ static void main_hook(void)
   gz_cull_view();
   gz_path_view();
   gz_holl_view();
+  gz_guard_view();
 
   /* execute free camera in view mode */
   gz_free_view();
@@ -838,7 +839,7 @@ HOOK void ocarina_update_hook(void)
     int audio_frames;
     /* sync hack by default when frame advancing or the song will softlock */
     if (gz.frames_queued >= 0)
-      audio_frames = z64_file.gameinfo->update_rate;
+      audio_frames = z64_gameinfo->update_rate;
     else
       audio_frames = z64_afx_counter - z64_ocarina_counter;
     /* if recording, use the sync hack setting to decide the value to use */
@@ -852,9 +853,9 @@ HOOK void ocarina_update_hook(void)
           loading a state (regardless of being paused or not). this seems to be
           unavoidable due to how states are currently implemented. **/
       if (settings->bits.hack_oca_sync)
-        audio_frames = z64_file.gameinfo->update_rate;
+        audio_frames = z64_gameinfo->update_rate;
       /* record the value if it differs from the sync hack */
-      if (audio_frames != z64_file.gameinfo->update_rate) {
+      if (audio_frames != z64_gameinfo->update_rate) {
         struct movie_oca_sync *os;
         os = vector_at(&gz.movie_oca_sync, gz.movie_oca_sync_pos);
         if (!os || os->frame_idx != gz.movie_frame) {
@@ -880,7 +881,7 @@ HOOK void ocarina_update_hook(void)
         ++gz.movie_oca_sync_pos;
       }
       else
-        audio_frames = z64_file.gameinfo->update_rate;
+        audio_frames = z64_gameinfo->update_rate;
     }
     /* update audio counters */
     {
@@ -1051,7 +1052,8 @@ HOOK void metronome_start_hook(uint16_t sfx_id, z64_xyzf_t *pos, uint8_t token,
 {
   maybe_init_gp();
 
-  if (gz.ready)
+  /* 0x4836 is NA_SE_SY_METRONOME - this is for iQue */
+  if (gz.ready && sfx_id == 0x4836)
     gz.metronome_timer = 17;
 
   return z64_Audio_PlaySfxGeneral(sfx_id, pos, token, freq_scale, vol,
@@ -1141,6 +1143,7 @@ static void init(void)
   gz.path_view_state = PATHVIEW_INACTIVE;
   gz.holl_view_state = HOLLVIEW_INACTIVE;
   gz.noclip_on = 0;
+  gz.guard_view_state = GUARDVIEW_INACTIVE;
   gz.hide_rooms = 0;
   gz.hide_actors = 0;
   gz.free_cam = 0;

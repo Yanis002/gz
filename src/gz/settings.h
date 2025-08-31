@@ -9,7 +9,7 @@
 #define SETTINGS_PADSIZE            ((sizeof(struct settings)+1)/2*2)
 #define SETTINGS_PROFILE_MAX        ((SETTINGS_MAXSIZE)/(SETTINGS_PADSIZE))
 #define SETTINGS_VERSION            0x0004
-#define SETTINGS_STATE_VERSION      0x0006
+#define SETTINGS_STATE_VERSION      0x0007
 #define SETTINGS_STATE_MIN_VER      0x0003
 
 #define SETTINGS_WATCHES_MAX        18
@@ -138,6 +138,7 @@ struct settings_bits
   uint32_t holl_view_all    : 1;
   uint32_t watches_visible  : 1;
   uint32_t gc_oob_chu       : 1;
+  uint32_t ignore_state_rng : 1;
 };
 
 struct settings_data
