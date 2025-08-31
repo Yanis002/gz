@@ -16,7 +16,16 @@ toolchain.
 To create a UPS patch or a pre-patched rom, run `./make-patch <rom-file>`
 or `./make-rom <rom-file>`. `<rom-file>` should be an unmodified rom to be
 used for creating the patch. Use `./make-patch-vc <rom-file>` to create a
-rom patch that targets the Wii VC. To create a patched Wii WAD with a gz rom
+rom patch that targets the GameCube or Wii VC.
+
+To create a patched GameCube ISO with a gz rom
+inject, run `./make-iso <iso-file>`. You will need `powerpc-eabi-gcc` (provided
+by [devkitPPC](https://wiibrew.org/wiki/DevkitPPC) or
+[wii-toolchain](https://github.com/krimtonz/wii-toolchain)) to build the
+`homeboy` submodule, which is always required because the unmodified GameCube
+emulator cannot run gz by itself.
+
+To create a patched Wii WAD with a gz rom
 inject, run `./make-wad <wad-file>`. You will need `powerpc-eabi-gcc` (provided
 by [devkitPPC](https://wiibrew.org/wiki/DevkitPPC) or
 [wii-toolchain](https://github.com/krimtonz/wii-toolchain)) to build the

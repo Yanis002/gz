@@ -22,7 +22,8 @@ rom_table =
                     gz_version  = "oot-1.0" .. version_suffix,
                     gz_name     = "gz-oot-1.0-j" .. version_suffix,
                     patches     = { "mem_patch", "ups_size_patch" },
-                    title_id    = "NG0J",
+                    gc_game_id    = "DG0J",
+                    wii_title_id  = "NG0J",
                   },
   [0xCD16C529]  = {
                     game        = "oot",
@@ -43,7 +44,8 @@ rom_table =
                     gz_version  = "oot-1.0" .. version_suffix,
                     gz_name     = "gz-oot-1.0-u" .. version_suffix,
                     patches     = { "mem_patch", "ups_size_patch" },
-                    title_id    = "NG0E",
+                    gc_game_id    = "DG0E",
+                    wii_title_id  = "NG0E",
                   },
   [0x26E73887]  = {
                     game        = "oot",
@@ -64,7 +66,8 @@ rom_table =
                     gz_version  = "oot-1.1" .. version_suffix,
                     gz_name     = "gz-oot-1.1-j" .. version_suffix,
                     patches     = { "mem_patch", "ups_size_patch" },
-                    title_id    = "NG1J",
+                    gc_game_id    = "DG1J",
+                    wii_title_id  = "NG1J",
                   },
   [0x3FD2151E]  = {
                     game        = "oot",
@@ -85,7 +88,8 @@ rom_table =
                     gz_version  = "oot-1.1" .. version_suffix,
                     gz_name     = "gz-oot-1.1-u" .. version_suffix,
                     patches     = { "mem_patch", "ups_size_patch" },
-                    title_id    = "NG1E",
+                    gc_game_id    = "DG1E",
+                    wii_title_id  = "NG1E",
                   },
   [0x2B2721BA]  = {
                     game        = "oot",
@@ -106,7 +110,8 @@ rom_table =
                     gz_version  = "oot-1.2" .. version_suffix,
                     gz_name     = "gz-oot-1.2-j" .. version_suffix,
                     patches     = { "mem_patch", "ups_size_patch" },
-                    title_id    = "NG2J",
+                    gc_game_id    = "DG2J",
+                    wii_title_id  = "NG2J",
                   },
   [0x32120C23]  = {
                     game        = "oot",
@@ -127,7 +132,8 @@ rom_table =
                     gz_version  = "oot-1.2" .. version_suffix,
                     gz_name     = "gz-oot-1.2-u" .. version_suffix,
                     patches     = { "mem_patch", "ups_size_patch" },
-                    title_id    = "NG2E",
+                    gc_game_id    = "DG2E",
+                    wii_title_id  = "NG2E",
                   },
   [0x122FF261]  = {
                     game        = "oot",
@@ -148,7 +154,8 @@ rom_table =
                     gz_version  = "oot-mq-j" .. version_suffix,
                     gz_name     = "gz-oot-mq-j" .. version_suffix,
                     patches     = { "mem_patch", "ups_size_patch" },
-                    title_id    = "NGQJ",
+                    gc_game_id    = "DGQJ",
+                    wii_title_id  = "NGQJ",
                   },
   [0xC744C4DB]  = {
                     game        = "oot",
@@ -169,7 +176,8 @@ rom_table =
                     gz_version  = "oot-mq-u" .. version_suffix,
                     gz_name     = "gz-oot-mq-u" .. version_suffix,
                     patches     = { "mem_patch", "ups_size_patch" },
-                    title_id    = "NGQE",
+                    gc_game_id    = "DGQE",
+                    wii_title_id  = "NGQE",
                   },
   [0x1C6CE8CB]  = {
                     game        = "oot",
@@ -190,7 +198,8 @@ rom_table =
                     gz_version  = "oot-gc-j" .. version_suffix,
                     gz_name     = "gz-oot-gc-j" .. version_suffix,
                     patches     = { "mem_patch", "ups_size_patch" },
-                    title_id    = "NGCJ",
+                    gc_game_id    = "DGCJ",
+                    wii_title_id  = "NGCJ",
                   },
   [0x346DE3AE]  = {
                     game        = "oot",
@@ -211,7 +220,8 @@ rom_table =
                     gz_version  = "oot-gc-u" .. version_suffix,
                     gz_name     = "gz-oot-gc-u" .. version_suffix,
                     patches     = { "mem_patch", "ups_size_patch" },
-                    title_id    = "NGCE",
+                    gc_game_id    = "DGCE",
+                    wii_title_id  = "NGCE",
                   },
   [0x8C5B90C1]  = {
                     game        = "oot",
@@ -232,7 +242,8 @@ rom_table =
                     gz_version  = "oot-ce-j" .. version_suffix,
                     gz_name     = "gz-oot-ce-j" .. version_suffix,
                     patches     = { "mem_patch", "ups_size_patch" },
-                    title_id    = "NGEJ",
+                    gc_game_id    = "DGEJ",
+                    wii_title_id  = "NGEJ",
                   },
 [0xF45C5532]    = {
                     game        = "oot",
@@ -253,7 +264,72 @@ rom_table =
                     gz_version  = "oot-ique-cn" .. version_suffix,
                     gz_name     = "gz-oot-ique-cn" .. version_suffix,
                     patches     = { "mem_patch", "hungup_patch" },
-                    title_id    = "NGBC",
+                    gc_title_id = "DGBC",
+                    wii_title_id = "NGBC",
+                  },
+}
+
+gc_table = {
+  [0xCC0649C4]  = {
+                    game_id       = "D43J",
+                    dol_path      = "zlj_f.tgc/main.dol",
+                    rom_path      = "zlj_f.tgc/zlj_f.n64",
+                    mq_rom_path   = "zlj_f.tgc/urazlj_f.n64",
+                    trim_paths    = {
+                                      "zlj_f.tgc/final_zelda_credits_sound.thp",
+                                      "S_Biohazard0.tgc",
+                                      "S_Biohazard4.tgc",
+                                      "S_DeadPhoenix.tgc",
+                                      "S_FZero.tgc",
+                                      "S_FinalFantasyADV.tgc",
+                                      "S_Killer7.tgc",
+                                      "S_KinnikuManII.tgc",
+                                      "S_MarioParty4.tgc",
+                                      "S_MrDori.tgc",
+                                      "S_PN03.tgc",
+                                      "S_VJ.tgc",
+                                      "S_ZeldaADV.tgc",
+                                    },
+                  },
+  [0x3642BF8B]  = {
+                    game_id       = "D43E",
+                    dol_path      = "zlj_f.tgc/main.dol",
+                    rom_path      = "zlj_f.tgc/zle_f.n64",
+                    mq_rom_path   = "zlj_f.tgc/urazle_f.n64",
+                    trim_paths    = {
+                                      "zlj_f.tgc/final_zelda_credits_sound.thp",
+                                      "S_1080.tgc",
+                                      "S_Clip.tgc",
+                                      "S_FZero.tgc",
+                                      "S_Metroid.tgc",
+                                      "S_Wario.tgc",
+                                      "S_Zelda.tgc",
+                                      "S_ZeldaADV.tgc",
+                                    },
+                  },
+  [0x8D29F717]  = {
+                    game_id       = "PZLJ",
+                    dol_path      = "tgc/120903_zelda.tgc/main.dol",
+                    rom_path      = "tgc/120903_zelda.tgc/zlj_f.n64",
+                    trim_paths    = {
+                                      "tgc/120903_zelda.tgc/final_zelda_credits_sound.thp",
+                                      "tgc/120903_zelda.tgc/SIM.elf",
+                                      "tgc/retrospec_movie_JP_final02.tgc",
+                                      "tgc/windwaker_movie_JP_final02.tgc",
+                                      "tgc/ZL_WindWakerSHOP_final_2003-10-31_17-54-53.tgc",
+                                    },
+                  },
+  [0xA8BEEA4B]  = {
+                    game_id       = "PZLE",
+                    dol_path      = "tgc/zelda_ENG_090903.tgc/main.dol",
+                    rom_path      = "tgc/zelda_ENG_090903.tgc/zle_f.n64",
+                    trim_paths    = {
+                                      "tgc/zelda_ENG_090903.tgc/us_final_zelda_credits_sound.thp",
+                                      "tgc/zelda_ENG_090903.tgc/SIM.elf",
+                                      "tgc/retrospec05.tgc",
+                                      "tgc/windwaker_movie_final07.tgc",
+                                      "tgc/ZL_WindWakerUSASHOP_final_2003-09-08_16-30-56.tgc",
+                                    },
                   },
 }
 

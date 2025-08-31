@@ -15,6 +15,7 @@ hooks/
 *.z64
 *.n64
 *.v64
+*.iso
 *.wad
 
 # Windows image file caches
