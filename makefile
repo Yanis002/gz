@@ -20,7 +20,7 @@ NM                    = $(program_prefix)nm
 GENHOOKS              = AS='$(AS)' OBJCOPY='$(OBJCOPY)' NM='$(NM)' ./genhooks
 LUAPATCH              = luapatch
 GRC                   = AS='$(AS)' grc
-LDSCRIPT              = gz.ld
+LDSCRIPT              = gl-n64.ld
 ALL_CPPFLAGS          = -DPACKAGE_TARNAME='$(PACKAGE_TARNAME)' -DPACKAGE_URL='$(PACKAGE_URL)' -DPACKAGE_VERSION='$(PACKAGE_VERSION)' -DF3DEX_GBI_2 $(CPPFLAGS) $(EXTRA_CPPFLAGS)
 ALL_CFLAGS            = -std=gnu11 -Wall -ffunction-sections -fdata-sections -mno-check-zero-division $(CFLAGS) $(EXTRA_CFLAGS)
 ALL_CXXFLAGS          = -std=gnu++14 -Wall -ffunction-sections -fdata-sections -mno-check-zero-division $(CXXFLAGS) $(EXTRA_CXXFLAGS)
@@ -29,7 +29,8 @@ ALL_LDLIBS            = $(LDLIBS)
 LUAFILE               = $(EMUDIR)/Lua/patch-data.lua
 RESDESC               = $(RESDIR)/resources.json
 GZ_VERSIONS           = oot-1.0 oot-1.1 oot-1.2 oot-mq-j oot-mq-u oot-gc-j oot-gc-u oot-ce-j oot-ique-cn oot-1.0-vc oot-1.1-vc oot-1.2-vc oot-mq-j-vc oot-mq-u-vc oot-gc-j-vc oot-gc-u-vc oot-ce-j-vc
-GZ_ADDRESS            = 80400000
+GZ_ADDRESS            = 80400060
+LDR_ADDRESS           = 80000400
 SRCDIR                = src
 RESDIR                = res
 LIBDIR                = lib

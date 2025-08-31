@@ -21,12 +21,12 @@ print("loading file system")
 local fs = gru.z64fs_load_blob(rom)
 
 print("patching files")
-local mem_patch = gru.gsc_load("gsc/" .. rom_info.data_dir .. "/mem_patch.gsc")
-local ups_size_patch = gru.gsc_load("gsc/" .. rom_info.data_dir ..
-                                    "/ups_size_patch.gsc")
-local hooks = gru.gsc_load("hooks/gz/" .. gz_version .. "/gz.gsc")
+local patches = { gru.gsc_load("hooks/gz/" .. gz_version .. "/gz.gsc") }
+for _,v in pairs(rom_info.patches) do
+  patches[#patches + 1] = gru.gsc_load("gsc/" .. rom_info.data_dir .. "/" .. v .. ".gsc")
+end
 local do_hooks = loadfile("lua/hooks.lua")
-do_hooks(rom_info, fs, { mem_patch, ups_size_patch, hooks })
+do_hooks(rom_info, fs, patches)
 
 print("reassembling rom")
 local patched_rom = fs:assemble_rom()
