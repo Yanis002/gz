@@ -151,6 +151,7 @@ if not opt_disable_controller_remappings then
     gzinject_cmd = gzinject_cmd .. " -p \"gzi/controller/gz_remap_default_" .. gc_version.game_id .. ".gzi\""
   end
 end
+gzinject_cmd = gzinject_cmd .. " -p \"gzi/memcard/gz_memcard_" .. gc_version.game_id .. ".gzi\""
 if opt_out ~= nil then
   gzinject_cmd = gzinject_cmd .. " -s \"" .. opt_out .. "\""
 elseif opt_title ~= nil then

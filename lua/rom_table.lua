@@ -245,7 +245,7 @@ rom_table =
                     gc_game_id    = "DGEJ",
                     wii_title_id  = "NGEJ",
                   },
-[0xF45C5532]    = {
+  [0xF45C5532]    = {
                     game        = "oot",
                     version     = "ique",
                     region      = "cn",
