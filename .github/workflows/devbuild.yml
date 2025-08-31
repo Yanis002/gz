@@ -14,14 +14,15 @@ on:
   push:
     branches:
       - master
+      - gc-dev
 
 jobs:
   build-platforms:
     name: Build platform packages
-    uses: PracticeROM/gz-release/.github/workflows/build-platforms.yml@master
+    uses: Yanis002/gz-release/.github/workflows/build-platforms.yml@gc-dev
     with:
-      repository: PracticeROM/gz-release
-      ref: master
+      repository: Yanis002/gz-release
+      ref: gc-dev
 
   build-gz:
     name: Build gz
@@ -42,8 +43,8 @@ jobs:
       - name: Checkout gz-release
         uses: actions/checkout@v4
         with:
-          repository: PracticeROM/gz-release
-          ref: master
+          repository: Yanis002/gz-release
+          ref: gc-dev
 
       - name: Fetch platform packages
         uses: actions/download-artifact@v5
@@ -99,11 +100,22 @@ jobs:
           done
           echo "EOF" >> "${GITHUB_OUTPUT}"
 
-      - name: Update development build
+      - name: Update development build (master)
+        if: ${{ github.ref == 'refs/heads/master' }}
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           automatic_release_tag: dev-latest
           prerelease: true
           title: Latest development build
+          files: ${{ steps.artifacts.outputs.files }}
+
+      - name: Update development build (gc-dev)
+        if: ${{ github.ref == 'refs/heads/gc-dev' }}
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: dev-gc-latest
+          prerelease: true
+          title: Latest GC development build
           files: ${{ steps.artifacts.outputs.files }}
