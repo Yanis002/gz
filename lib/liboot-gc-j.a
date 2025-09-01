@@ -69,7 +69,6 @@ z64_CheckAfxConfigBusy            = 0x800CC1A8 ;
 z64_LoadOverlay                   = 0x800CD440 ;
 z64_SeedRandom                    = 0x800CE3F0 ;
 z64_guPerspectiveF_hook           = 0x800D1008 ;
-z64_guPerspective_camo            = 0x800D1240 ;
 osGetCurrFaultedThread            = 0x800D6480 ;
 z64_metronome_start_1             = 0x800E0660 ;
 z64_metronome_start_2             = 0x800E0968 ;
