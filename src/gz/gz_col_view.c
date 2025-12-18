@@ -256,183 +256,188 @@ static void ico_sph_subdivide_edge(z64_xyzf_t *r, z64_xyzf_t *a, z64_xyzf_t *b)
   vec3f_norm(r, r);
 }
 
+static Gfx *p_sph_gfx = NULL;
+
+static void gen_ico_sphere(void)
+{
+  z64_xyzf_t vtx[42];
+  int r0_n = 1,   r0_m = r0_n / 5,  r0_i = 0    + 0;
+  int r1_n = 5,   r1_m = r1_n / 5,  r1_i = r0_i + r0_n;
+  int r2_n = 10,  r2_m = r2_n / 5,  r2_i = r1_i + r1_n;
+  int r3_n = 10,  r3_m = r3_n / 5,  r3_i = r2_i + r2_n;
+  int r4_n = 10,  r4_m = r4_n / 5,  r4_i = r3_i + r3_n;
+  int r5_n = 5,   r5_m = r5_n / 5,  r5_i = r4_i + r4_n;
+  int r6_n = 1,   r6_m = r6_n / 5,  r6_i = r5_i + r5_n;
+
+  vtx[r0_i + (0 * r0_m + 0) % r0_n] = (z64_xyzf_t){0.f, 1.f, 0.f};
+  vtx[r6_i + (0 * r6_m + 0) % r6_n] = (z64_xyzf_t){0.f, -1.f, 0.f};
+  for (int i = 0; i < 5; ++i) {
+    float a_xz = 2.f * M_PI / 10.f;
+    float a_y = atanf(1.f / 2.f);
+    vtx[r2_i + (i * r2_m + 0) % r2_n] = (z64_xyzf_t)
+    {
+      cos(a_xz * (i * r2_m + 0)) * cos(a_y * 1.f),
+      sin(a_y * 1.f),
+      -sin(a_xz * (i * r2_m + 0)) * cos(a_y * 1.f),
+    };
+    vtx[r4_i + (i * r4_m + 0) % r4_n] = (z64_xyzf_t)
+    {
+      cos(a_xz * (i * r4_m + 1)) * cos(a_y * -1.f),
+      sin(a_y * -1.f),
+      -sin(a_xz * (i * r4_m + 1)) * cos(a_y * -1.f),
+    };
+  }
+  for (int i = 0; i < 5; ++i) {
+    ico_sph_subdivide_edge(&vtx[r1_i + (i * r1_m + 0) % r1_n],
+                            &vtx[r0_i + (i * r0_m + 0) % r0_n],
+                            &vtx[r2_i + (i * r2_m + 0) % r2_n]);
+    ico_sph_subdivide_edge(&vtx[r2_i + (i * r2_m + 1) % r2_n],
+                            &vtx[r2_i + (i * r2_m + 0) % r2_n],
+                            &vtx[r2_i + (i * r2_m + 2) % r2_n]);
+    ico_sph_subdivide_edge(&vtx[r3_i + (i * r3_m + 0) % r3_n],
+                            &vtx[r2_i + (i * r2_m + 0) % r2_n],
+                            &vtx[r4_i + (i * r4_m + 0) % r4_n]);
+    ico_sph_subdivide_edge(&vtx[r3_i + (i * r3_m + 1) % r3_n],
+                            &vtx[r4_i + (i * r4_m + 0) % r4_n],
+                            &vtx[r2_i + (i * r2_m + 2) % r2_n]);
+    ico_sph_subdivide_edge(&vtx[r4_i + (i * r4_m + 1) % r4_n],
+                            &vtx[r4_i + (i * r4_m + 0) % r4_n],
+                            &vtx[r4_i + (i * r4_m + 2) % r4_n]);
+    ico_sph_subdivide_edge(&vtx[r5_i + (i * r5_m + 0) % r5_n],
+                            &vtx[r4_i + (i * r4_m + 0) % r4_n],
+                            &vtx[r6_i + (i * r6_m + 0) % r6_n]);
+  }
+
+  static Vtx sph_vtx[42];
+  static Gfx sph_gfx[45];
+
+  for (int i = 0; i < 42; ++i)
+    vtxn_f2l(&sph_vtx[i], &vtx[i]);
+
+  p_sph_gfx = sph_gfx;
+  Gfx *sph_gfx_p = p_sph_gfx;
+
+  gSPSetGeometryMode(sph_gfx_p++, G_CULL_BACK | G_SHADING_SMOOTH);
+
+  gSPVertex(sph_gfx_p++, &sph_vtx[r0_i], r0_n + r1_n + r2_n + r3_n,
+            r0_i - r0_i);
+  r3_i -= r0_i;
+  r2_i -= r0_i;
+  r1_i -= r0_i;
+  r0_i -= r0_i;
+  for (int i = 0; i < 5; ++i) {
+    int v[24] =
+    {
+      r0_i + (i * r0_m + 0) % r0_n,
+      r1_i + (i * r1_m + 0) % r1_n,
+      r1_i + (i * r1_m + 1) % r1_n,
+
+      r1_i + (i * r1_m + 0) % r1_n,
+      r2_i + (i * r2_m + 0) % r2_n,
+      r2_i + (i * r2_m + 1) % r2_n,
+
+      r1_i + (i * r1_m + 0) % r1_n,
+      r2_i + (i * r2_m + 1) % r2_n,
+      r1_i + (i * r1_m + 1) % r1_n,
+
+      r1_i + (i * r1_m + 1) % r1_n,
+      r2_i + (i * r2_m + 1) % r2_n,
+      r2_i + (i * r2_m + 2) % r2_n,
+
+      r2_i + (i * r2_m + 0) % r2_n,
+      r3_i + (i * r3_m + 0) % r3_n,
+      r2_i + (i * r2_m + 1) % r2_n,
+
+      r2_i + (i * r2_m + 1) % r2_n,
+      r3_i + (i * r3_m + 0) % r3_n,
+      r3_i + (i * r3_m + 1) % r3_n,
+
+      r2_i + (i * r2_m + 1) % r2_n,
+      r3_i + (i * r3_m + 1) % r3_n,
+      r2_i + (i * r2_m + 2) % r2_n,
+
+      r2_i + (i * r2_m + 2) % r2_n,
+      r3_i + (i * r3_m + 1) % r3_n,
+      r3_i + (i * r3_m + 2) % r3_n,
+    };
+    gSP2Triangles(sph_gfx_p++,
+                  v[0],   v[1],   v[2],   0,
+                  v[3],   v[4],   v[5],   0);
+    gSP2Triangles(sph_gfx_p++,
+                  v[6],   v[7],   v[8],   0,
+                  v[9],   v[10],  v[11],  0);
+    gSP2Triangles(sph_gfx_p++,
+                  v[12],  v[13],  v[14],  0,
+                  v[15],  v[16],  v[17],  0);
+    gSP2Triangles(sph_gfx_p++,
+                  v[18],  v[19],  v[20],  0,
+                  v[21],  v[22],  v[23],  0);
+  }
+
+  gSPVertex(sph_gfx_p++, &sph_vtx[r4_i], r4_n + r5_n + r6_n,
+            r4_i - r4_i);
+  r6_i -= r4_i;
+  r5_i -= r4_i;
+  r4_i -= r4_i;
+  for (int i = 0; i < 5; ++i) {
+    int v[24] =
+    {
+      r3_i + (i * r3_m + 1) % r3_n,
+      r4_i + (i * r4_m + 0) % r4_n,
+      r4_i + (i * r4_m + 1) % r4_n,
+
+      r3_i + (i * r3_m + 1) % r3_n,
+      r4_i + (i * r4_m + 1) % r4_n,
+      r3_i + (i * r3_m + 2) % r3_n,
+
+      r3_i + (i * r3_m + 2) % r3_n,
+      r4_i + (i * r4_m + 1) % r4_n,
+      r4_i + (i * r4_m + 2) % r4_n,
+
+      r3_i + (i * r3_m + 2) % r3_n,
+      r4_i + (i * r4_m + 2) % r4_n,
+      r3_i + (i * r3_m + 3) % r3_n,
+
+      r4_i + (i * r4_m + 0) % r4_n,
+      r5_i + (i * r5_m + 0) % r5_n,
+      r4_i + (i * r4_m + 1) % r4_n,
+
+      r4_i + (i * r4_m + 1) % r4_n,
+      r5_i + (i * r5_m + 0) % r5_n,
+      r5_i + (i * r5_m + 1) % r5_n,
+
+      r4_i + (i * r4_m + 1) % r4_n,
+      r5_i + (i * r5_m + 1) % r5_n,
+      r4_i + (i * r4_m + 2) % r4_n,
+
+      r5_i + (i * r5_m + 0) % r5_n,
+      r6_i + (i * r6_m + 0) % r6_n,
+      r5_i + (i * r5_m + 1) % r5_n,
+    };
+    gSP2Triangles(sph_gfx_p++,
+                  v[0],   v[1],   v[2],   0,
+                  v[3],   v[4],   v[5],   0);
+    gSP2Triangles(sph_gfx_p++,
+                  v[6],   v[7],   v[8],   0,
+                  v[9],   v[10],  v[11],  0);
+    gSP2Triangles(sph_gfx_p++,
+                  v[12],  v[13],  v[14],  0,
+                  v[15],  v[16],  v[17],  0);
+    gSP2Triangles(sph_gfx_p++,
+                  v[18],  v[19],  v[20],  0,
+                  v[21],  v[22],  v[23],  0);
+  }
+
+  gSPClearGeometryMode(sph_gfx_p++, G_CULL_BACK | G_SHADING_SMOOTH);
+  gSPEndDisplayList(sph_gfx_p++);
+}
+
+
 static void draw_ico_sphere(Gfx **p_gfx_p, Gfx **p_gfx_d,
                             float x, float y, float z, float radius)
 {
-  static Gfx *p_sph_gfx = NULL;
-
-  if (!p_sph_gfx) {
-    z64_xyzf_t vtx[42];
-    int r0_n = 1,   r0_m = r0_n / 5,  r0_i = 0    + 0;
-    int r1_n = 5,   r1_m = r1_n / 5,  r1_i = r0_i + r0_n;
-    int r2_n = 10,  r2_m = r2_n / 5,  r2_i = r1_i + r1_n;
-    int r3_n = 10,  r3_m = r3_n / 5,  r3_i = r2_i + r2_n;
-    int r4_n = 10,  r4_m = r4_n / 5,  r4_i = r3_i + r3_n;
-    int r5_n = 5,   r5_m = r5_n / 5,  r5_i = r4_i + r4_n;
-    int r6_n = 1,   r6_m = r6_n / 5,  r6_i = r5_i + r5_n;
-
-    vtx[r0_i + (0 * r0_m + 0) % r0_n] = (z64_xyzf_t){0.f, 1.f, 0.f};
-    vtx[r6_i + (0 * r6_m + 0) % r6_n] = (z64_xyzf_t){0.f, -1.f, 0.f};
-    for (int i = 0; i < 5; ++i) {
-      float a_xz = 2.f * M_PI / 10.f;
-      float a_y = atanf(1.f / 2.f);
-      vtx[r2_i + (i * r2_m + 0) % r2_n] = (z64_xyzf_t)
-      {
-        cos(a_xz * (i * r2_m + 0)) * cos(a_y * 1.f),
-        sin(a_y * 1.f),
-        -sin(a_xz * (i * r2_m + 0)) * cos(a_y * 1.f),
-      };
-      vtx[r4_i + (i * r4_m + 0) % r4_n] = (z64_xyzf_t)
-      {
-        cos(a_xz * (i * r4_m + 1)) * cos(a_y * -1.f),
-        sin(a_y * -1.f),
-        -sin(a_xz * (i * r4_m + 1)) * cos(a_y * -1.f),
-      };
-    }
-    for (int i = 0; i < 5; ++i) {
-      ico_sph_subdivide_edge(&vtx[r1_i + (i * r1_m + 0) % r1_n],
-                             &vtx[r0_i + (i * r0_m + 0) % r0_n],
-                             &vtx[r2_i + (i * r2_m + 0) % r2_n]);
-      ico_sph_subdivide_edge(&vtx[r2_i + (i * r2_m + 1) % r2_n],
-                             &vtx[r2_i + (i * r2_m + 0) % r2_n],
-                             &vtx[r2_i + (i * r2_m + 2) % r2_n]);
-      ico_sph_subdivide_edge(&vtx[r3_i + (i * r3_m + 0) % r3_n],
-                             &vtx[r2_i + (i * r2_m + 0) % r2_n],
-                             &vtx[r4_i + (i * r4_m + 0) % r4_n]);
-      ico_sph_subdivide_edge(&vtx[r3_i + (i * r3_m + 1) % r3_n],
-                             &vtx[r4_i + (i * r4_m + 0) % r4_n],
-                             &vtx[r2_i + (i * r2_m + 2) % r2_n]);
-      ico_sph_subdivide_edge(&vtx[r4_i + (i * r4_m + 1) % r4_n],
-                             &vtx[r4_i + (i * r4_m + 0) % r4_n],
-                             &vtx[r4_i + (i * r4_m + 2) % r4_n]);
-      ico_sph_subdivide_edge(&vtx[r5_i + (i * r5_m + 0) % r5_n],
-                             &vtx[r4_i + (i * r4_m + 0) % r4_n],
-                             &vtx[r6_i + (i * r6_m + 0) % r6_n]);
-    }
-
-    static Vtx sph_vtx[42];
-    static Gfx sph_gfx[45];
-
-    for (int i = 0; i < 42; ++i)
-      vtxn_f2l(&sph_vtx[i], &vtx[i]);
-
-    p_sph_gfx = sph_gfx;
-    Gfx *sph_gfx_p = p_sph_gfx;
-
-    gSPSetGeometryMode(sph_gfx_p++, G_CULL_BACK | G_SHADING_SMOOTH);
-
-    gSPVertex(sph_gfx_p++, &sph_vtx[r0_i], r0_n + r1_n + r2_n + r3_n,
-              r0_i - r0_i);
-    r3_i -= r0_i;
-    r2_i -= r0_i;
-    r1_i -= r0_i;
-    r0_i -= r0_i;
-    for (int i = 0; i < 5; ++i) {
-      int v[24] =
-      {
-        r0_i + (i * r0_m + 0) % r0_n,
-        r1_i + (i * r1_m + 0) % r1_n,
-        r1_i + (i * r1_m + 1) % r1_n,
-
-        r1_i + (i * r1_m + 0) % r1_n,
-        r2_i + (i * r2_m + 0) % r2_n,
-        r2_i + (i * r2_m + 1) % r2_n,
-
-        r1_i + (i * r1_m + 0) % r1_n,
-        r2_i + (i * r2_m + 1) % r2_n,
-        r1_i + (i * r1_m + 1) % r1_n,
-
-        r1_i + (i * r1_m + 1) % r1_n,
-        r2_i + (i * r2_m + 1) % r2_n,
-        r2_i + (i * r2_m + 2) % r2_n,
-
-        r2_i + (i * r2_m + 0) % r2_n,
-        r3_i + (i * r3_m + 0) % r3_n,
-        r2_i + (i * r2_m + 1) % r2_n,
-
-        r2_i + (i * r2_m + 1) % r2_n,
-        r3_i + (i * r3_m + 0) % r3_n,
-        r3_i + (i * r3_m + 1) % r3_n,
-
-        r2_i + (i * r2_m + 1) % r2_n,
-        r3_i + (i * r3_m + 1) % r3_n,
-        r2_i + (i * r2_m + 2) % r2_n,
-
-        r2_i + (i * r2_m + 2) % r2_n,
-        r3_i + (i * r3_m + 1) % r3_n,
-        r3_i + (i * r3_m + 2) % r3_n,
-      };
-      gSP2Triangles(sph_gfx_p++,
-                    v[0],   v[1],   v[2],   0,
-                    v[3],   v[4],   v[5],   0);
-      gSP2Triangles(sph_gfx_p++,
-                    v[6],   v[7],   v[8],   0,
-                    v[9],   v[10],  v[11],  0);
-      gSP2Triangles(sph_gfx_p++,
-                    v[12],  v[13],  v[14],  0,
-                    v[15],  v[16],  v[17],  0);
-      gSP2Triangles(sph_gfx_p++,
-                    v[18],  v[19],  v[20],  0,
-                    v[21],  v[22],  v[23],  0);
-    }
-
-    gSPVertex(sph_gfx_p++, &sph_vtx[r4_i], r4_n + r5_n + r6_n,
-              r4_i - r4_i);
-    r6_i -= r4_i;
-    r5_i -= r4_i;
-    r4_i -= r4_i;
-    for (int i = 0; i < 5; ++i) {
-      int v[24] =
-      {
-        r3_i + (i * r3_m + 1) % r3_n,
-        r4_i + (i * r4_m + 0) % r4_n,
-        r4_i + (i * r4_m + 1) % r4_n,
-
-        r3_i + (i * r3_m + 1) % r3_n,
-        r4_i + (i * r4_m + 1) % r4_n,
-        r3_i + (i * r3_m + 2) % r3_n,
-
-        r3_i + (i * r3_m + 2) % r3_n,
-        r4_i + (i * r4_m + 1) % r4_n,
-        r4_i + (i * r4_m + 2) % r4_n,
-
-        r3_i + (i * r3_m + 2) % r3_n,
-        r4_i + (i * r4_m + 2) % r4_n,
-        r3_i + (i * r3_m + 3) % r3_n,
-
-        r4_i + (i * r4_m + 0) % r4_n,
-        r5_i + (i * r5_m + 0) % r5_n,
-        r4_i + (i * r4_m + 1) % r4_n,
-
-        r4_i + (i * r4_m + 1) % r4_n,
-        r5_i + (i * r5_m + 0) % r5_n,
-        r5_i + (i * r5_m + 1) % r5_n,
-
-        r4_i + (i * r4_m + 1) % r4_n,
-        r5_i + (i * r5_m + 1) % r5_n,
-        r4_i + (i * r4_m + 2) % r4_n,
-
-        r5_i + (i * r5_m + 0) % r5_n,
-        r6_i + (i * r6_m + 0) % r6_n,
-        r5_i + (i * r5_m + 1) % r5_n,
-      };
-      gSP2Triangles(sph_gfx_p++,
-                    v[0],   v[1],   v[2],   0,
-                    v[3],   v[4],   v[5],   0);
-      gSP2Triangles(sph_gfx_p++,
-                    v[6],   v[7],   v[8],   0,
-                    v[9],   v[10],  v[11],  0);
-      gSP2Triangles(sph_gfx_p++,
-                    v[12],  v[13],  v[14],  0,
-                    v[15],  v[16],  v[17],  0);
-      gSP2Triangles(sph_gfx_p++,
-                    v[18],  v[19],  v[20],  0,
-                    v[21],  v[22],  v[23],  0);
-    }
-
-    gSPClearGeometryMode(sph_gfx_p++, G_CULL_BACK | G_SHADING_SMOOTH);
-    gSPEndDisplayList(sph_gfx_p++);
-  }
+  if (!p_sph_gfx)
+    gen_ico_sphere();
 
   Mtx m;
   {
@@ -1972,5 +1977,408 @@ void gz_guard_view(void)
     release_mem(&guard_view_buf[0]);
     release_mem(&guard_view_buf[1]);
     gz.guard_view_state = GUARDVIEW_INACTIVE;
+  }
+}
+
+/* * * * * * * * */
+/* Chu Simulator */
+/* * * * * * * * */
+
+struct gz_chu_sim_state
+{
+  /* chu kinematics */
+  z64_actor_t actor;
+  int16_t     timer;
+  z64_xyzf_t  axis_fwd;
+  z64_xyzf_t  axis_up;
+  z64_xyzf_t  axis_left;
+  /* simulation variables */
+  z64_xyzf_t  start_pos;
+  z64_angle_t start_rot_y;
+  int16_t     release_time;
+  int16_t     exploded_time;
+  _Bool       exploded;
+  /* simulation path rendering */
+  struct {
+    Mtx       mtx[121];
+    Gfx       dl[2][1 + 2 * 121 + 1];
+  } gfx;
+};
+
+static void mtxf_create_axis_angle_rotation(MtxF *restrict dst,
+                                            float angle,
+                                            const z64_xyzf_t *restrict axis)
+{
+  float sin;
+  float cos;
+  float rCos;
+  float temp2;
+  float temp3;
+
+  if (angle != 0) {
+    sin = sinf(angle);
+    cos = cosf(angle);
+    rCos = 1.0f - cos;
+
+    dst->xx = axis->x * axis->x * rCos + cos;
+    dst->yy = axis->y * axis->y * rCos + cos;
+    dst->zz = axis->z * axis->z * rCos + cos;
+
+    temp2 = axis->x * rCos * axis->y;
+    temp3 = axis->z * sin;
+    dst->yx = temp2 + temp3;
+    dst->xy = temp2 - temp3;
+
+    temp2 = axis->x * rCos * axis->z;
+    temp3 = axis->y * sin;
+    dst->zx = temp2 - temp3;
+    dst->xz = temp2 + temp3;
+
+    temp2 = axis->y * rCos * axis->z;
+    temp3 = axis->x * sin;
+    dst->zy = temp2 + temp3;
+    dst->yz = temp2 - temp3;
+
+    dst->wx = dst->wy = dst->wz = dst->xw = dst->yw = dst->zw = 0.0f;
+    dst->ww = 1.0f;
+  } else {
+    dst->yx = 0.0f;
+    dst->zx = 0.0f;
+    dst->wx = 0.0f;
+    dst->xy = 0.0f;
+    dst->zy = 0.0f;
+    dst->wy = 0.0f;
+    dst->xz = 0.0f;
+    dst->yz = 0.0f;
+    dst->wz = 0.0f;
+    dst->xw = 0.0f;
+    dst->yw = 0.0f;
+    dst->zw = 0.0f;
+    dst->xx = 1.0f;
+    dst->yy = 1.0f;
+    dst->zz = 1.0f;
+    dst->ww = 1.0f;
+  }
+}
+
+/* Simulate the chu exploding */
+static void gz_chu_sim_explode(struct gz_chu_sim_state *sim)
+{
+  sim->exploded = 1;
+  sim->exploded_time = sim->timer;
+  sim->actor.xz_speed = 0.0f;
+}
+
+static void gz_chu_sim_update_floor_poly(struct gz_chu_sim_state *sim,
+                                         z64_col_poly_t* floor_poly)
+{
+  if (floor_poly == NULL) {
+    gz_chu_sim_explode(sim);
+    return;
+  }
+  sim->actor.floor_poly = floor_poly;
+
+  z64_xyzf_t normal = {
+    .x = floor_poly->norm.x * (1.0f / 32767),
+    .y = floor_poly->norm.y * (1.0f / 32767),
+    .z = floor_poly->norm.z * (1.0f / 32767),
+  };
+
+  float n_dot_up = vec3f_dot(&normal, &sim->axis_up);
+  if (fabsf(n_dot_up) >= 1.0f)
+      return;
+  float angle = acosf(n_dot_up);
+  if (angle < 0.001f)
+      return;
+
+  z64_xyzf_t n_x_up;
+  vec3f_cross(&n_x_up, &sim->axis_up, &normal);
+
+  MtxF rot;
+  mtxf_create_axis_angle_rotation(&rot, angle, &n_x_up);
+  n_x_up.x = rot.xw + rot.xx * sim->axis_left.x
+                    + rot.xy * sim->axis_left.y
+                    + rot.xz * sim->axis_left.z;
+  n_x_up.y = rot.yw + rot.yx * sim->axis_left.x
+                    + rot.yy * sim->axis_left.y
+                    + rot.yz * sim->axis_left.z;
+  n_x_up.z = rot.zw + rot.zx * sim->axis_left.x
+                    + rot.zy * sim->axis_left.y
+                    + rot.zz * sim->axis_left.z;
+  sim->axis_left = n_x_up;
+
+  vec3f_cross(&sim->axis_fwd, &sim->axis_left, &normal);
+
+  float mag = vec3f_mag(&sim->axis_fwd);
+  if (mag < 0.001f) {
+      gz_chu_sim_explode(sim);
+      return;
+  }
+  float inv_mag = 1.0f / mag;
+  sim->axis_fwd.x *= inv_mag;
+  sim->axis_fwd.y *= inv_mag;
+  sim->axis_fwd.z *= inv_mag;
+
+  sim->axis_up = normal;
+
+  const float rad_to_binang = 0x8000 / M_PI;
+  sim->actor.world_rot.x = rad_to_binang * atan2f(-sim->axis_fwd.y,
+    sqrtf(sim->axis_fwd.x * sim->axis_fwd.x + sim->axis_fwd.z * sim->axis_fwd.z));
+  if (sim->actor.world_rot.x == 0x4000 || sim->actor.world_rot.x == -0x4000) {
+    sim->actor.world_rot.y = rad_to_binang * atan2f(-sim->axis_left.z, sim->axis_left.x);
+    sim->actor.world_rot.z = 0;
+  } else {
+    sim->actor.world_rot.y = rad_to_binang * atan2f(sim->axis_fwd.x, sim->axis_fwd.z);
+    sim->actor.world_rot.z = rad_to_binang * atan2f(sim->axis_left.y, normal.y);
+  }
+  sim->actor.world_rot.x = -sim->actor.world_rot.x;
+}
+
+/* Simulate the chu being released at the chosen release time */
+static void gz_chu_sim_release(struct gz_chu_sim_state *sim)
+{
+  sim->timer = sim->release_time;
+  if (sim->timer < sim->exploded_time)
+      sim->exploded_time = sim->timer;
+
+  /* Gross resetting of actor state */
+  memset(&sim->actor, 0, sizeof(sim->actor));
+
+  z64_xyzf_t start_pos = z64_link.common.pos_2;
+  z64_angle_t start_rot_y = z64_link.common.rot_2.y;
+  if (gz.chu_view_freeze) {
+    start_pos = sim->start_pos;
+    start_rot_y = sim->start_rot_y;
+  } else {
+    sim->start_pos = start_pos;
+    sim->start_rot_y = start_rot_y;
+  }
+
+  sim->actor.pos_4 = sim->actor.pos_2 = start_pos;
+  z64_Actor_UpdateBgCheckInfo(&z64_game, &sim->actor, 0.0f, 0.0f, 0.0f, 4);
+  sim->actor.world_rot.y = sim->actor.rot_2.y = start_rot_y;
+
+  sim->axis_fwd.x = z64_Math_SinS(sim->actor.rot_2.y);
+  sim->axis_fwd.y = 0.0f;
+  sim->axis_fwd.z = z64_Math_CosS(sim->actor.rot_2.y);
+
+  sim->axis_up.x = 0.0f;
+  sim->axis_up.y = 1.0f;
+  sim->axis_up.z = 0.0f;
+
+  sim->axis_left.x = z64_Math_SinS(sim->actor.rot_2.y + 0x4000);
+  sim->axis_left.y = 0;
+  sim->axis_left.z = z64_Math_CosS(sim->actor.rot_2.y + 0x4000);
+
+  sim->actor.xz_speed = 8.0f;
+  gz_chu_sim_update_floor_poly(sim, sim->actor.floor_poly);
+}
+
+/* Initialize the simulation */
+static void gz_chu_sim_init(struct gz_chu_sim_state *sim)
+{
+  sim->axis_fwd = (z64_xyzf_t){0};
+  sim->axis_up = (z64_xyzf_t){0};
+  sim->axis_left = (z64_xyzf_t){0};
+  sim->start_pos = (z64_xyzf_t){0};
+  sim->start_rot_y = 0;
+  sim->exploded = 0;
+  sim->release_time = 0;
+  sim->exploded_time = 120;
+  gz_chu_sim_release(sim);
+}
+
+#define WALL_FLAG_CRAWLSPACE (3 << 4)
+
+/* Simulate the chu running over a surface */
+static void gz_chu_sim_move(struct gz_chu_sim_state *sim)
+{
+  sim->actor.xz_speed = 8.0f;
+  float line_length = sim->actor.xz_speed * 2.0f;
+
+  if (sim->timer != 0)
+      sim->timer--;
+  if (sim->timer < sim->exploded_time)
+      sim->exploded_time = sim->timer;
+  if (sim->timer == 0) {
+      gz_chu_sim_explode(sim);
+      return;
+  }
+
+  z64_xyzf_t pos_a = {
+    .x = sim->actor.pos_2.x + sim->axis_up.x * 2.0f,
+    .y = sim->actor.pos_2.y + sim->axis_up.y * 2.0f,
+    .z = sim->actor.pos_2.z + sim->axis_up.z * 2.0f,
+  };
+  z64_xyzf_t pos_b = {
+    .x = sim->actor.pos_2.x - sim->axis_up.x * 4.0f,
+    .y = sim->actor.pos_2.y - sim->axis_up.y * 4.0f,
+    .z = sim->actor.pos_2.z - sim->axis_up.z * 4.0f,
+  };
+
+  int32_t bg_id_updown;
+  z64_col_poly_t *poly_updown;
+  z64_xyzf_t pos_updown;
+
+  int32_t bg_id_side;
+  z64_col_poly_t *poly_side;
+  z64_xyzf_t pos_side;
+
+  if (z64_BgCheck_EntityLineTest1(&z64_game.col_ctxt, &pos_a, &pos_b, &pos_updown,
+                                  &poly_updown, 1, 1, 1, 1, &bg_id_updown) &&
+      !(z64_SurfaceType_GetWallFlags(&z64_game.col_ctxt, poly_updown, bg_id_updown) & WALL_FLAG_CRAWLSPACE) &&
+      !z64_SurfaceType_IsIgnoredByProjectiles(&z64_game.col_ctxt, poly_updown, bg_id_updown)) {
+    pos_b.x = pos_a.x + sim->axis_fwd.x * line_length;
+    pos_b.y = pos_a.y + sim->axis_fwd.y * line_length;
+    pos_b.z = pos_a.z + sim->axis_fwd.z * line_length;
+
+    if (z64_BgCheck_EntityLineTest1(&z64_game.col_ctxt, &pos_a, &pos_b, &pos_side,
+                                    &poly_side, 1, 1, 1, 1, &bg_id_side) &&
+        !(z64_SurfaceType_GetWallFlags(&z64_game.col_ctxt, poly_side, bg_id_side) & WALL_FLAG_CRAWLSPACE) &&
+        !z64_SurfaceType_IsIgnoredByProjectiles(&z64_game.col_ctxt, poly_side, bg_id_side)) {
+      gz_chu_sim_update_floor_poly(sim, poly_side);
+      sim->actor.pos_2 = pos_side;
+      sim->actor.floor_poly_source = bg_id_side;
+      sim->actor.xz_speed = 0.0f;
+    } else {
+      if (sim->actor.floor_poly != poly_updown)
+          gz_chu_sim_update_floor_poly(sim, poly_updown);
+      sim->actor.pos_2 = pos_updown;
+      sim->actor.floor_poly_source = bg_id_updown;
+    }
+  } else {
+    sim->actor.xz_speed = 0.0f;
+    line_length *= 3.0f;
+    pos_a = pos_b;
+
+    int i;
+    for (i = 0; i < 3; i++) {
+      if (i == 0) {
+        pos_b.x = pos_a.x - sim->axis_fwd.x * line_length;
+        pos_b.y = pos_a.y - sim->axis_fwd.y * line_length;
+        pos_b.z = pos_a.z - sim->axis_fwd.z * line_length;
+      } else if (i == 1) {
+        pos_b.x = pos_a.x + sim->axis_left.x * line_length;
+        pos_b.y = pos_a.y + sim->axis_left.y * line_length;
+        pos_b.z = pos_a.z + sim->axis_left.z * line_length;
+      } else {
+        pos_b.x = pos_a.x - sim->axis_left.x * line_length;
+        pos_b.y = pos_a.y - sim->axis_left.y * line_length;
+        pos_b.z = pos_a.z - sim->axis_left.z * line_length;
+      }
+
+      if (z64_BgCheck_EntityLineTest1(&z64_game.col_ctxt, &pos_a, &pos_b, &pos_side,
+                                      &poly_side, 1, 1, 1, 1, &bg_id_side) &&
+          !(z64_SurfaceType_GetWallFlags(&z64_game.col_ctxt, poly_side, bg_id_side) & WALL_FLAG_CRAWLSPACE) &&
+          !z64_SurfaceType_IsIgnoredByProjectiles(&z64_game.col_ctxt, poly_side, bg_id_side)) {
+        gz_chu_sim_update_floor_poly(sim, poly_side);
+        sim->actor.pos_2 = pos_side;
+        sim->actor.floor_poly_source = bg_id_side;
+        break;
+      }
+    }
+
+    if (i == 3)
+      gz_chu_sim_explode(sim);
+  }
+
+  z64_Math_ScaledStepToS(&sim->actor.rot_2.x, -sim->actor.world_rot.x, 0x800);
+  z64_Math_ScaledStepToS(&sim->actor.rot_2.y,  sim->actor.world_rot.y, 0x800);
+  z64_Math_ScaledStepToS(&sim->actor.rot_2.z,  sim->actor.world_rot.z, 0x800);
+}
+
+/* chu simulation update function */
+static void gz_chu_sim_update(struct gz_chu_sim_state *sim)
+{
+  /* Step multiple times per frame, until limit or exploded */
+  for (int i = 0; i < gz.chu_view_steps_per_frame && !sim->exploded; i++) {
+    gz_chu_sim_move(sim);
+
+    float speedRate = 3/* R_UPDATE_RATE */ * 0.5f;
+    float speed = sim->actor.xz_speed;
+    float speedXZ = speed * z64_Math_CosS(sim->actor.world_rot.x);
+    sim->actor.pos_2.x += speedRate * speedXZ * z64_Math_SinS(sim->actor.world_rot.y);
+    sim->actor.pos_2.y += speedRate * speed * z64_Math_SinS(sim->actor.world_rot.x);
+    sim->actor.pos_2.z += speedRate * speedXZ * z64_Math_CosS(sim->actor.world_rot.y);
+
+    float x = sim->actor.pos_2.x;
+    float y = sim->actor.pos_2.y;
+    float z = sim->actor.pos_2.z;
+    float scal = 0.05f;
+
+    sim->gfx.mtx[sim->timer] = gdSPDefMtx(
+      scal, 0.0f, 0.0f, 0.0f,
+      0.0f, scal, 0.0f, 0.0f,
+      0.0f, 0.0f, scal, 0.0f,
+      x,    y,    z,    1.0f);
+  }
+
+  /* Reset the sim if the chu exploded, recompute the path */
+  if (sim->exploded) {
+    sim->exploded = 0;
+    gz_chu_sim_release(sim);
+  }
+}
+
+void gz_chu_view(void)
+{
+  static Gfx gfx_setup[] = {
+    gsSPLoadGeometryMode(G_ZBUFFER | G_SHADE | G_LIGHTING),
+    gsSPTexture(qu016(0.5), qu016(0.5), 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCycleType(G_CYC_1CYCLE),
+    gsDPSetRenderMode(Z_CMP | IM_RD | CVG_DST_FULL | FORCE_BL | ZMODE_XLU |
+                      GBL_c1(G_BL_CLR_IN, G_BL_A_IN, G_BL_CLR_MEM, G_BL_1MA),
+                      Z_CMP | IM_RD | CVG_DST_FULL | FORCE_BL | ZMODE_XLU |
+                      GBL_c2(G_BL_CLR_IN, G_BL_A_IN, G_BL_CLR_MEM, G_BL_1MA)),
+    gsDPSetCombine(G_CC_MODE(G_CC_MODULATERGB_PRIM_ENVA, G_CC_MODULATERGB_PRIM_ENVA)),
+    gsDPSetPrimColor(0, 0, 0xC0, 0xC0, 0xC0, 0x80),
+    gsDPSetEnvColor(0xFF, 0xFF, 0xFF, 0x80),
+    gsSPEndDisplayList(),
+  };
+  static struct gz_chu_sim_state *sim = NULL;
+  static int chu_view_idx = 0;
+
+  _Bool enable = zu_in_game() && z64_game.pause_ctxt.state == 0;
+
+  if (gz.chu_view_state == CHUVIEW_START) {
+    if (!p_sph_gfx)
+      gen_ico_sphere();
+    sim = malloc(sizeof(struct gz_chu_sim_state));
+    if (!sim) {
+      gz.chu_view_state = CHUVIEW_STOPPING;
+      gz_log("out of memory, stopping chu view");
+      return;
+    }
+    gz_chu_sim_init(sim);
+    gz.chu_view_state = CHUVIEW_ACTIVE;
+  }
+
+  if (enable && gz.chu_view_state == CHUVIEW_ACTIVE) {
+    sim->release_time = gz.chu_view_release_time;
+    gz_chu_sim_update(sim);
+
+    Gfx *sim_gfx = sim->gfx.dl[chu_view_idx];
+    chu_view_idx = (chu_view_idx + 1) % 2;
+
+    Gfx *sim_gfx_p = sim_gfx;
+    gSPDisplayList(sim_gfx_p++, gfx_setup);
+    for (int i = sim->release_time; i > sim->exploded_time; i--) {
+      Mtx *mtx = &sim->gfx.mtx[i];
+      gSPMatrix(sim_gfx_p++, mtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+      gSPDisplayList(sim_gfx_p++, p_sph_gfx);
+    }
+    gSPEndDisplayList(sim_gfx_p++);
+
+    dcache_wb(&sim->gfx, sizeof(sim->gfx));
+
+    gSPDisplayList(z64_ctxt.gfx->poly_xlu.p++, sim_gfx);
+  }
+
+  if (gz.chu_view_state == CHUVIEW_STOPPING)
+    gz.chu_view_state = CHUVIEW_STOP;
+  else if (gz.chu_view_state == CHUVIEW_STOP) {
+    release_mem(&sim);
+    gz.chu_view_state = CHUVIEW_INACTIVE;
   }
 }

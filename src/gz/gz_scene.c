@@ -154,6 +154,74 @@ static int guard_view_proc(struct menu_item *item,
   return 0;
 }
 
+static int chu_view_proc(struct menu_item *item,
+                         enum menu_callback_reason reason,
+                         void *data)
+{
+  if (reason == MENU_CALLBACK_SWITCH_ON) {
+    if (gz.chu_view_state == CHUVIEW_INACTIVE)
+      gz.chu_view_state = CHUVIEW_START;
+  }
+  else if (reason == MENU_CALLBACK_SWITCH_OFF) {
+    if (gz.chu_view_state != CHUVIEW_INACTIVE)
+      gz.chu_view_state = CHUVIEW_STOPPING;
+  }
+  else if (reason == MENU_CALLBACK_THINK) {
+    _Bool state = gz.chu_view_state == CHUVIEW_START ||
+                  gz.chu_view_state == CHUVIEW_ACTIVE;
+    if (menu_checkbox_get(item) != state)
+      menu_checkbox_set(item, state);
+  }
+  return 0;
+}
+
+static int chu_view_time_proc(struct menu_item *item,
+                              enum menu_callback_reason reason,
+                              void *data)
+{
+  if (reason == MENU_CALLBACK_CHANGED) {
+    gz.chu_view_release_time = menu_intinput_gets(item);
+    if (gz.chu_view_release_time > 120)
+      gz.chu_view_release_time = 120;
+    if (gz.chu_view_release_time < 1)
+      gz.chu_view_release_time = 1;
+  } else if (reason == MENU_CALLBACK_THINK) {
+    if (menu_intinput_gets(item) != gz.chu_view_release_time)
+      menu_intinput_set(item, gz.chu_view_release_time);
+  }
+  return 0;
+}
+
+static int chu_steps_proc(struct menu_item *item,
+                          enum menu_callback_reason reason,
+                          void *data)
+{
+  if (reason == MENU_CALLBACK_CHANGED) {
+    gz.chu_view_steps_per_frame = menu_intinput_gets(item);
+    if (gz.chu_view_steps_per_frame > 20)
+      gz.chu_view_steps_per_frame = 20;
+    if (gz.chu_view_steps_per_frame < 1)
+      gz.chu_view_steps_per_frame = 1;
+  } else if (reason == MENU_CALLBACK_THINK) {
+    if (menu_intinput_gets(item) != gz.chu_view_steps_per_frame)
+      menu_intinput_set(item, gz.chu_view_steps_per_frame);
+  }
+  return 0;
+}
+
+static int chu_view_freeze_proc(struct menu_item *item,
+                                enum menu_callback_reason reason,
+                                void *data)
+{
+  if (reason == MENU_CALLBACK_SWITCH_ON)
+    gz.chu_view_freeze = 1;
+  else if (reason == MENU_CALLBACK_SWITCH_OFF)
+    gz.chu_view_freeze = 0;
+  else if (reason == MENU_CALLBACK_THINK)
+    menu_checkbox_set(item, gz.chu_view_freeze);
+  return 0;
+}
+
 static int col_view_mode_proc(struct menu_item *item,
                               enum menu_callback_reason reason,
                               void *data)
@@ -658,6 +726,15 @@ struct menu *gz_scene_menu(void)
   /* guard vision control */
   menu_add_static(&visuals, 0, 10, "show guards view", 0xC0C0C0);
   menu_add_checkbox(&visuals, 18, 10, guard_view_proc, NULL);
+  /* chu path control */
+  menu_add_static(&visuals, 0, 11, "show chu path", 0xC0C0C0);
+  menu_add_checkbox(&visuals, 18, 11, chu_view_proc, NULL);
+  menu_add_static(&visuals, 2, 12, "release time", 0xC0C0C0);
+  menu_add_intinput(&visuals, 18, 12, 10, 3, chu_view_time_proc, NULL);
+  menu_add_static(&visuals, 2, 13, "steps per frame", 0xC0C0C0);
+  menu_add_intinput(&visuals, 18, 13, 10, 2, chu_steps_proc, NULL);
+  menu_add_static(&visuals, 2, 14, "freeze start", 0xC0C0C0);
+  menu_add_checkbox(&visuals, 18, 14, chu_view_freeze_proc, NULL);
 
   /* populate camera menu */
   camera.selector = menu_add_submenu(&camera, 0, 0, NULL, "return");

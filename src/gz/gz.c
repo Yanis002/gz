@@ -409,6 +409,7 @@ static void main_hook(void)
   gz_path_view();
   gz_holl_view();
   gz_guard_view();
+  gz_chu_view();
 
   /* execute free camera in view mode */
   gz_free_view();
@@ -1163,6 +1164,10 @@ static void init(void)
   gz.holl_view_state = HOLLVIEW_INACTIVE;
   gz.noclip_on = 0;
   gz.guard_view_state = GUARDVIEW_INACTIVE;
+  gz.chu_view_state = CHUVIEW_INACTIVE;
+  gz.chu_view_release_time = 120;
+  gz.chu_view_steps_per_frame = 10;
+  gz.chu_view_freeze = 0;
   gz.hide_rooms = 0;
   gz.hide_actors = 0;
   gz.free_cam = 0;

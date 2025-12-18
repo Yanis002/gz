@@ -918,9 +918,15 @@ struct z64_actor_s
   uint16_t          sound_effect;             /* 0x0020 */
   char              unk_0x22[0x0002];         /* 0x0022 */
   z64_xyzf_t        pos_2;                    /* 0x0024 */
-  char              unk_0x30[0x0002];         /* 0x0030 */
-  uint16_t          xz_dir;                   /* 0x0032 */
-  char              unk_0x34[0x0004];         /* 0x0034 */
+  union {
+    z64_xyz_t       world_rot;                /* 0x0030 */
+    struct {
+      char          unk_0x30[0x0002];         /* 0x0030 */
+      uint16_t      xz_dir;                   /* 0x0032 */
+      char          unk_0x34[0x0002];         /* 0x0034 */
+    };
+  };
+  char              unk_0x36[0x0002];         /* 0x0036 */
   z64_xyzf_t        pos_3;                    /* 0x0038 */
   z64_rot_t         rot_1;                    /* 0x0044 */
   char              unk_0x4A[0x0002];         /* 0x004A */
@@ -2371,5 +2377,24 @@ uint32_t  z64_LoadOverlay             (uint32_t vrom_start, uint32_t vrom_end,
                                        uint32_t vram_start, uint32_t vram_end,
                                        void *dst);
 void      z64_SeedRandom              (uint32_t seed);
+int32_t z64_BgCheck_EntityLineTest1   (z64_col_ctxt_t *col_ctxt,
+                                       z64_xyzf_t *pos_a,
+                                       z64_xyzf_t *pos_b,
+                                       z64_xyzf_t *pos_dst,
+                                       z64_col_poly_t **poly,
+                                       int32_t chk_wall,
+                                       int32_t chk_floor,
+                                       int32_t chk_ceil,
+                                       int32_t chk_single_face,
+                                       int32_t *bg_id);
+int32_t z64_SurfaceType_GetWallFlags  (z64_col_ctxt_t *col_ctxt,
+                                       z64_col_poly_t *poly,
+                                       int32_t bg_id);
+int32_t z64_SurfaceType_IsIgnoredByProjectiles(z64_col_ctxt_t *col_ctxt,
+                                               z64_col_poly_t *poly,
+                                               int32_t bg_id);
+int32_t z64_Math_ScaledStepToS        (z64_angle_t *pValue,
+                                       int16_t target,
+                                       int16_t step);
 
 #endif

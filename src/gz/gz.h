@@ -79,6 +79,15 @@ enum guard_view_state
   GUARDVIEW_STOP,
 };
 
+enum chu_view_state
+{
+  CHUVIEW_INACTIVE,
+  CHUVIEW_START,
+  CHUVIEW_ACTIVE,
+  CHUVIEW_STOPPING,
+  CHUVIEW_STOP,
+};
+
 enum cam_mode
 {
   CAMMODE_CAMERA,
@@ -200,6 +209,10 @@ struct gz
   enum path_view_state  path_view_state;
   enum holl_view_state  holl_view_state;
   enum guard_view_state guard_view_state;
+  enum chu_view_state   chu_view_state;
+  int                   chu_view_release_time;
+  int                   chu_view_steps_per_frame;
+  _Bool                 chu_view_freeze;
   _Bool                 noclip_on;
   _Bool                 hide_rooms;
   _Bool                 hide_actors;
@@ -274,6 +287,7 @@ void          gz_cull_view(void);
 void          gz_path_view(void);
 void          gz_holl_view(void);
 void          gz_guard_view(void);
+void          gz_chu_view(void);
 
 void          gz_update_cam(void);
 void          gz_free_view(void);

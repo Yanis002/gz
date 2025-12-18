@@ -187,3 +187,7 @@ z64_bombchu_floor_poly_hook       = ovl_En_Bom_Chu + 0x654 ;
 Health_UpdateBeatingHeart         = 0x80065A14 ;
 Health_UpdateBeatingHeart_hook    = Health_UpdateBeatingHeart + 0xA0 ;
 Sfx_PlaySfxCentered = 0x800646F0 ;
+z64_Math_ScaledStepToS            = 0x80063704 ;
+z64_BgCheck_EntityLineTest1       = 0x800308B4 ;
+z64_SurfaceType_GetWallFlags      = 0x8003444C ;
+z64_SurfaceType_IsIgnoredByProjectiles = 0x80034700 ;
