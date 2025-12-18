@@ -1,6 +1,6 @@
 #include "z64_version.h"
 
-.section  .text.startup, "ax", @progbits
+.section  .ldr, "ax", @progbits
 .set      nomips16
 .set      nomicromips
 
@@ -16,7 +16,6 @@
 #elif Z64_VERSION == Z64_OOTIQC
 .equ      entry_size, 0x50
 #endif
-.equ      image_rom_ptr_addr, entrypoint + entry_size - 4
 
 .local    ldr
 .ent      ldr
@@ -30,11 +29,12 @@ ldr:
   beq     $v1, 0x6864, no_dma
 #endif
   /* begin dma transfer */
-  lui     $v1, %hi(__image_start)
-  addiu   $v1, $v1, %lo(__image_start)
+  lui     $v1, %hi(__image_ram)
+  addiu   $v1, $v1, %lo(__image_ram)
   sw      $v1, 0x0000($v0)
-  lui     $v1, %hi(image_rom_ptr_addr)
-  lw      $v1, %lo(image_rom_ptr_addr)($v1)
+  lui_ori:
+  lui     $v1, 0x0000
+  ori     $v1, $v1, 0x0000
   sw      $v1, 0x0004($v0)
   lui     $v1, %hi(__image_size - 1)
   addiu   $v1, $v1, %lo(__image_size - 1)
@@ -49,12 +49,12 @@ ldr:
   no_dma:
   /* jump to preamble, moved here by patcher */
   j       ldr
+  .fill   entry_size - (. - ldr)
 .end      ldr
 .size     ldr, . - ldr
 
-.fill     entry_size - 4 - (. - ldr)
-.local    image_rom_ptr
-.type     image_rom_ptr, @object
-image_rom_ptr:
-  /* magic placeholder number, to be filled in by patcher */
-  .word   0x01234567
+.global   __ldr_rom_lui_ori
+.set      __ldr_rom_lui_ori, lui_ori - ldr
+
+.global   __ldr_size
+.set      __ldr_size, . - ldr

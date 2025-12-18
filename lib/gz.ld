@@ -1,17 +1,20 @@
 OUTPUT_FORMAT("elf32-bigmips", "elf32-bigmips", "elf32-littlemips")
 OUTPUT_ARCH(mips)
 ENTRY(_start)
+
 SECTIONS
 {
-  PROVIDE(start = 0x80000400) ;
-  . = start ;
+  PROVIDE(start = 0x80400000) ;
 
-  __image_start = . & 0x1FFFFFFF ;
+  .hdr              : { KEEP(*(SORT_NONE(.hdr)))
+                        KEEP(*(SORT(.hdr.*))) }
 
-  .text             : { PROVIDE(_start = .) ;
-                        KEEP(*(SORT_NONE(.text.startup)))
-                        KEEP(*(SORT(.text.startup.*)))
-                        KEEP(*(.text.hook .text.hook.*))
+  .ldr        start : AT(SIZEOF(.hdr))
+                      { __image_start = . ;
+                        PROVIDE(_start = .) ;
+                        KEEP(*(SORT_NONE(.ldr)))
+                        KEEP(*(SORT(.ldr.*))) }
+  .text             : { KEEP(*(.text.hook .text.hook.*))
                         KEEP(*crt0.o(.text SORT(.text.*)))
                         *(.text .text.*)
                         *(.gnu.linkonce.t.*) }
@@ -66,8 +69,10 @@ SECTIONS
   .lit8             : { *(.lit8) }
   .lit4             : { *(.lit4) }
 
-  __image_end = . & 0x1FFFFFFF ;
+  __image_end = . ;
   __image_size = __image_end - __image_start ;
+  __image_offset = LOADADDR(.ldr) ;
+  __image_ram = __image_start & 0x1FFFFFFF ;
 
   __bss_start = . ;
   .sbss    (NOLOAD) : { *(.sbss .sbss.*)

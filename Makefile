@@ -101,6 +101,7 @@ OBJ-$(1)              = $$(ASMOBJ-$(1)) $$(COBJ-$(1)) $$(CXXOBJ-$(1)) $$(RESOBJ-
 DEPS-$(1)             = $$(patsubst %.o,%.d,$$(OBJ-$(1)))
 BIN-$(1)              = $$(BINDIR-$(1))/$$(NAME-$(1)).bin
 ELF-$(1)              = $$(BINDIR-$(1))/$$(NAME-$(1)).elf
+MAP-$(1)              = $$(BINDIR-$(1))/$$(NAME-$(1)).map
 BUILD-$(1)            = $(1)
 CLEAN-$(1)            = clean-$(1)
 -include $$(DEPS-$(1))
@@ -112,7 +113,7 @@ $$(CLEAN-$(1))        :
 $$(BIN-$(1))          : $$(ELF-$(1)) | $$(BINDIR-$(1))
 	$$(OBJCOPY) -S -O binary $$< $$@
 $$(ELF-$(1))          : $$(OBJ-$(1)) | $$(BINDIR-$(1))
-	$$(LD) $$(ALL_LDFLAGS) $$^ $$(ALL_LDLIBS) -o $$@
+	$$(LD) $$(ALL_LDFLAGS) $$^ $$(ALL_LDLIBS) -Wl,-Map,$$(MAP-$(1)) -o $$@
 $$(ASMOBJ-$(1))       : $$(OBJDIR-$(1))/%.o: $$(SRCDIR-$(1))/% | $$(OBJDIR-$(1))
 	$$(CCAS) -c -MMD -MP $$(ALL_CPPFLAGS) $$< -o $$@
 $$(COBJ-$(1))         : $$(OBJDIR-$(1))/%.o: $$(SRCDIR-$(1))/% | $$(OBJDIR-$(1))

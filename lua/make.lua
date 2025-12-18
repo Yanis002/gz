@@ -32,14 +32,18 @@ print("reassembling rom")
 local patched_rom = fs:assemble_rom()
 
 print("inserting payload")
-local gz = gru.blob_load("bin/gz/" .. gz_version .. "/gz.bin")
+local bin = gru.blob_load("bin/gz/" .. gz_version .. "/gz.bin")
+local gz_start = bin:read32be(0x0)
+local gz_size = bin:read32be(0x4)
+local ldr_size = bin:read32be(0x8)
+local ldr_rom_lui_ori = bin:read32be(0xC)
+local gz = bin:copy(gz_start, gz_size)
+
 if gz:size() % 16 ~= 0 then gz:resize(gz:size() + 16 - gz:size() % 16) end
 local payload_rom = fs:prom_tail()
-local ldr_loc = gz:find(gru.blob_string("\x01\x23\x45\x67"))
-if ldr_loc == nil then error("cannot find ldr in gz image", 0) end
-local ldr_size = ldr_loc + 4
-gz:write32be(ldr_loc, payload_rom | 0x10000000)
 local ldr = gz:copy(0, ldr_size)
+ldr:write16be(ldr_rom_lui_ori + 0x2, (payload_rom | 0x10000000) >> 16)
+ldr:write16be(ldr_rom_lui_ori + 0x6, (payload_rom | 0x10000000))
 local old_ldr = patched_rom:copy(0x1000, ldr_size)
 gz:write(0, old_ldr)
 patched_rom:write(0x1000, ldr)
