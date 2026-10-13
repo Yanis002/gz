@@ -173,6 +173,23 @@ static int warp_info_draw_proc(struct menu_item *item,
   }
   else
     gfx_printf(font, x, y + ch * 2, "current cutscene none");
+
+  int totalEntries = ((int*)z64_game.cutscene_ptr)[0];
+  int frameCount = ((int*)z64_game.cutscene_ptr)[1];
+  uint8_t tolerance = 60; // what we consider to be acceptable
+
+  if (frameCount <= 0 || totalEntries <= 0) {
+    gfx_printf(font, x, y + ch * 4, "cs pointer will work");
+  } else if (frameCount <= tolerance || totalEntries <= tolerance) {
+    gfx_printf(font, x, y + ch * 4, "cs pointer might work");
+  } else {
+    gfx_printf(font, x, y + ch * 4, "cs pointer won't work");
+  }
+
+  gfx_printf(font, x, y + ch * 5, "cs pointer is    0x%08" PRIx32, z64_game.cutscene_ptr);
+  gfx_printf(font, x, y + ch * 6, "frame count is   0x%08" PRIx32, frameCount);
+  gfx_printf(font, x, y + ch * 7, "total entries is 0x%08" PRIx32, totalEntries);
+
   return 1;
 }
 
