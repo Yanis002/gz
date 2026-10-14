@@ -191,3 +191,4 @@ z64_Math_ScaledStepToS            = 0x80063DC4 ;
 z64_BgCheck_EntityLineTest1       = 0x80030EF4 ;
 z64_SurfaceType_GetWallFlags      = 0x80034A8C ;
 z64_SurfaceType_IsIgnoredByProjectiles = 0x80034D40 ;
+Room_Draw                         = 0x80081270 ;

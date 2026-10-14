@@ -219,6 +219,7 @@ static int chu_view_freeze_proc(struct menu_item *item,
     gz.chu_view_freeze = 0;
   else if (reason == MENU_CALLBACK_THINK)
     menu_checkbox_set(item, gz.chu_view_freeze);
+
   return 0;
 }
 

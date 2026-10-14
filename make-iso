@@ -1,0 +1,4 @@
+#!/bin/sh
+
+gru lua/make-iso.lua "$@"
+rm -rf isoextract

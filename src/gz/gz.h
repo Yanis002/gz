@@ -108,6 +108,15 @@ enum movie_state
   MOVIE_PLAYING,
 };
 
+enum guard_view_state
+{
+  GUARDVIEW_INACTIVE,
+  GUARDVIEW_START,
+  GUARDVIEW_ACTIVE,
+  GUARDVIEW_BEGIN_STOP,
+  GUARDVIEW_STOP,
+};
+
 struct movie_input
 {
   z64_controller_t      raw;            /* 0x0000 */
@@ -172,6 +181,7 @@ struct gz
   uint16_t              day_time_prev;
   int                   target_day_time;
   int32_t               frames_queued;
+  _Bool                 frame_ran;
   struct zu_disp_p      z_disp_p;
   uint32_t              disp_hook_size[4];
   uint32_t              disp_hook_p[4];
@@ -302,6 +312,7 @@ struct menu  *gz_inventory_menu(void);
 struct menu  *gz_equips_menu(void);
 struct menu  *gz_file_menu(void);
 struct menu  *gz_macro_menu(void);
+struct menu  *gz_trainer_menu(void);
 struct menu  *gz_debug_menu(void);
 struct menu  *gz_settings_menu(void);
 

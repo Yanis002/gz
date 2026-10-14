@@ -2,6 +2,7 @@
 *.cbp
 *.layout
 *.kdev4
+.vscode/
 
 # Generated files
 obj/
@@ -15,6 +16,7 @@ hooks/
 *.z64
 *.n64
 *.v64
+*.iso
 *.wad
 *.iso
 
