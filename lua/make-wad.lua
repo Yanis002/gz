@@ -121,7 +121,7 @@ local gzinject_cmd = gzinject ..
 if opt_id ~= nil then
   gzinject_cmd = gzinject_cmd .. " -i \"" .. opt_id .. "\""
 else
-  gzinject_cmd = gzinject_cmd .. " -i " .. rom_info.wii_title_id
+  gzinject_cmd = gzinject_cmd .. " -i " .. rom_info.title_id
 end
 if opt_title ~= nil then
   gzinject_cmd = gzinject_cmd .. " -t \"" .. opt_title .. "\""

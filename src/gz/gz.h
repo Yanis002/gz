@@ -108,15 +108,6 @@ enum movie_state
   MOVIE_PLAYING,
 };
 
-enum guard_view_state
-{
-  GUARDVIEW_INACTIVE,
-  GUARDVIEW_START,
-  GUARDVIEW_ACTIVE,
-  GUARDVIEW_BEGIN_STOP,
-  GUARDVIEW_STOP,
-};
-
 struct movie_input
 {
   z64_controller_t      raw;            /* 0x0000 */
